@@ -1,0 +1,531 @@
+<script setup lang="ts">
+import { onMounted, onUnmounted, ref, useTemplateRef } from 'vue'
+import { site } from '@/config'
+import Icon from '@/components/Icon.vue'
+
+const navLinks = [
+  { label: 'Product', href: '#product' },
+  { label: 'Exports', href: '#exports' },
+  { label: 'Who it’s for', href: '#audiences' },
+]
+
+const year = new Date().getFullYear()
+
+const cardRef = useTemplateRef<HTMLDivElement>('cardRef')
+const spacerRef = useTemplateRef<HTMLDivElement>('spacerRef')
+const canvasRef = useTemplateRef<HTMLCanvasElement>('canvasRef')
+
+const FONT_FAMILY = '"Plus Jakarta Sans"'
+const WORDMARK = 'Getdraft'
+
+interface Dot {
+  ox: number
+  oy: number
+  x: number
+  y: number
+  scatterX: number
+  scatterY: number
+  r: number
+  color: string
+  wasMovedByMouse: boolean
+  opacity: number
+  revealAt: number
+  resetAt: number
+}
+
+function createDot(ox: number, oy: number, r: number): Dot {
+  return {
+    ox,
+    oy,
+    x: ox,
+    y: oy,
+    scatterX: (Math.random() - 0.5) * 2,
+    scatterY: (Math.random() - 0.5) * 2,
+    r,
+    color: '#ffffff',
+    wasMovedByMouse: false,
+    opacity: 0,
+    revealAt: 0,
+    resetAt: 0,
+  }
+}
+
+interface GlyphParticle {
+  id: number
+  x: number
+  y: number
+  char: '●' | '○'
+  color: string
+  rot: number
+  fontSize: number
+}
+
+const glyphs = ref<GlyphParticle[]>([])
+let glyphIdCounter = 0
+let lastGlyphEmitTime = 0
+const GLYPH_THROTTLE_MS = 50
+const GLYPH_LIFETIME_MS = 350
+const glyphTimers = new Map<number, ReturnType<typeof setTimeout>>()
+
+let CONFETTI_PALETTE: string[] = ['#ffffff']
+
+function resolveColor(varName: string, fallback: string): string {
+  const value = getComputedStyle(document.documentElement).getPropertyValue(varName).trim()
+  return value || fallback
+}
+
+function resolveConfettiPalette() {
+  CONFETTI_PALETTE = [
+    '#ffffff',
+    resolveColor('--color-brand-bright', '#7747ff'),
+    resolveColor('--color-tint', '#f3f0ff'),
+    resolveColor('--color-mint', '#00641d'),
+    resolveColor('--color-mint-soft', '#e9f8ed'),
+    resolveColor('--color-coral', '#b6191a'),
+    resolveColor('--color-coral-soft', '#fce2e6'),
+  ]
+}
+
+const REVEAL_DURATION = 900
+const RESET_DELAY = 200
+const RESET_DURATION = 900
+
+const mouse = { x: -9999, y: -9999, radius: 150 }
+let dots: Dot[] = []
+let canvasWidth = 0
+let canvasHeight = 0
+let rafId: number | null = null
+let resizeObserver: ResizeObserver | null = null
+let entranceObserver: IntersectionObserver | null = null
+let resizePending = false
+let mql: MediaQueryList | null = null
+let prefersReducedMotion = false
+let hasRevealed = false
+let entranceActive = false
+let entranceStart = 0
+
+function distanceFromOrigin(d: Dot): number {
+  return Math.hypot(d.x - d.ox, d.y - d.oy)
+}
+
+function updateDot(d: Dot) {
+  const dx = d.x - mouse.x
+  const dy = d.y - mouse.y
+  const dist = Math.hypot(dx, dy)
+
+  if (dist < mouse.radius) {
+    const e = 1 - dist / mouse.radius
+    const amplitude = e * e * 300
+    const lerp = Math.max(0.015, 0.04 * e)
+    const targetX = d.ox + d.scatterX * amplitude
+    const targetY = d.oy + d.scatterY * amplitude
+    d.x += (targetX - d.x) * lerp
+    d.y += (targetY - d.y) * lerp
+    d.wasMovedByMouse = true
+
+    if (distanceFromOrigin(d) > 5 && d.color === '#ffffff') {
+      d.color = CONFETTI_PALETTE[Math.floor(Math.random() * CONFETTI_PALETTE.length)]
+    }
+  } else {
+    d.x += (d.ox - d.x) * 0.03
+    d.y += (d.oy - d.y) * 0.03
+    if (distanceFromOrigin(d) < 2 && d.wasMovedByMouse) {
+      d.color = '#ffffff'
+      d.wasMovedByMouse = false
+    }
+  }
+}
+
+function drawDot(ctx: CanvasRenderingContext2D, d: Dot) {
+  if (d.opacity <= 0) return
+  ctx.globalAlpha = d.opacity
+  ctx.fillStyle = d.color
+  ctx.beginPath()
+  ctx.arc(d.x, d.y, d.r, 0, Math.PI * 2)
+  ctx.fill()
+  ctx.globalAlpha = 1
+}
+
+function clearAllGlyphs() {
+  for (const timer of glyphTimers.values()) clearTimeout(timer)
+  glyphTimers.clear()
+  glyphs.value = []
+}
+
+function maybeEmitGlyphs(x: number, y: number) {
+  if (prefersReducedMotion) return
+  const now = performance.now()
+  if (now - lastGlyphEmitTime < GLYPH_THROTTLE_MS) return
+  lastGlyphEmitTime = now
+
+  const isMobile = canvasWidth < 480
+  const count = 1 + Math.floor(Math.random() * 3)
+  const fontSize = isMobile ? 6 : 16
+  const glyphPalette = ['#3B673B', '#682C4B', 'rgba(255,255,255,0.45)']
+
+  for (let i = 0; i < count; i++) {
+    const angle = Math.random() * Math.PI * 2
+    const dist = 30 + Math.random() * 90
+    const id = glyphIdCounter++
+    glyphs.value.push({
+      id,
+      x: x + Math.cos(angle) * dist,
+      y: y + Math.sin(angle) * dist,
+      char: Math.random() < 0.5 ? '●' : '○',
+      color: glyphPalette[Math.floor(Math.random() * glyphPalette.length)],
+      rot: -10 + Math.random() * 20,
+      fontSize,
+    })
+    const timer = setTimeout(() => {
+      glyphs.value = glyphs.value.filter((g) => g.id !== id)
+      glyphTimers.delete(id)
+    }, GLYPH_LIFETIME_MS)
+    glyphTimers.set(id, timer)
+  }
+}
+
+async function rasterizeText(waitForFont: boolean) {
+  if (waitForFont) {
+    try {
+      await document.fonts.load(`800 100px ${FONT_FAMILY}`)
+      await document.fonts.ready
+    } catch {
+      // progressive enhancement — proceed with whatever font is available
+    }
+  }
+
+  const card = cardRef.value
+  const spacer = spacerRef.value
+  const canvas = canvasRef.value
+  if (!card || !spacer || !canvas) return
+
+  const cardRect = card.getBoundingClientRect()
+  const width = Math.max(1, Math.round(cardRect.width))
+  const height = Math.max(1, Math.round(cardRect.height))
+  const dpr = window.devicePixelRatio || 1
+
+  canvasWidth = width
+  canvasHeight = height
+
+  canvas.width = width * dpr
+  canvas.height = height * dpr
+  canvas.style.width = `${width}px`
+  canvas.style.height = `${height}px`
+
+  const ctx = canvas.getContext('2d')
+  if (!ctx) return
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0)
+
+  const spacerRect = spacer.getBoundingClientRect()
+  const spacerLocalTop = spacerRect.top - cardRect.top
+  const spacerLocalHeight = Math.max(1, Math.round(spacerRect.height))
+
+  const offscreen = document.createElement('canvas')
+  offscreen.width = width
+  offscreen.height = height
+  const offCtx = offscreen.getContext('2d', { willReadFrequently: true })
+  if (!offCtx) return
+
+  const targetWidth = width * 0.86
+  const maxFontSize = spacerLocalHeight * 0.7
+
+  let lo = 10
+  let hi = spacerLocalHeight * 1.4
+  for (let i = 0; i < 12; i++) {
+    const mid = (lo + hi) / 2
+    offCtx.font = `800 ${mid}px ${FONT_FAMILY}`
+    const measured = offCtx.measureText(WORDMARK).width
+    if (measured > targetWidth) hi = mid
+    else lo = mid
+  }
+  const fontSize = Math.min(lo, maxFontSize)
+
+  offCtx.clearRect(0, 0, width, height)
+  offCtx.fillStyle = '#ffffff'
+  offCtx.textAlign = 'center'
+  offCtx.textBaseline = 'middle'
+  offCtx.font = `800 ${fontSize}px ${FONT_FAMILY}`
+  offCtx.fillText(WORDMARK, width / 2, spacerLocalTop + spacerLocalHeight / 2)
+
+  const isMobile = width < 480
+  const gap = isMobile ? 4 : 11
+  const dotRadius = isMobile ? 1.5 : 4.5
+  mouse.radius = isMobile ? 70 : 150
+
+  const imageData = offCtx.getImageData(0, 0, width, height).data
+
+  const newDots: Dot[] = []
+  for (let gy = 0; gy < height; gy += gap) {
+    for (let gx = 0; gx < width; gx += gap) {
+      const px = Math.floor(gx)
+      const py = Math.floor(gy)
+      const idx = (py * width + px) * 4
+      const r = imageData[idx]
+      const g = imageData[idx + 1]
+      const b = imageData[idx + 2]
+      const alpha = imageData[idx + 3]
+      if (alpha > 128 && r > 200 && g > 200 && b > 200) {
+        const dot = createDot(gx, gy, dotRadius)
+        if (hasRevealed || prefersReducedMotion) dot.opacity = 1
+        newDots.push(dot)
+      }
+    }
+  }
+  dots = newDots
+}
+
+function scheduleEntranceReveal() {
+  const n = dots.length || 1
+
+  const revealOrder = [...dots].sort(() => Math.random() - 0.5)
+  revealOrder.forEach((d, i) => {
+    d.revealAt = (i / n) * REVEAL_DURATION
+  })
+
+  const resetOrder = [...dots].sort(() => Math.random() - 0.5)
+  resetOrder.forEach((d, i) => {
+    d.resetAt = REVEAL_DURATION + RESET_DELAY + (i / n) * RESET_DURATION
+  })
+
+  entranceStart = performance.now()
+  entranceActive = true
+}
+
+function stepEntrance() {
+  if (!entranceActive) return
+  const elapsed = performance.now() - entranceStart
+  let stillActive = false
+
+  for (const d of dots) {
+    if (d.opacity === 0 && elapsed >= d.revealAt) {
+      d.opacity = 1
+      d.color = CONFETTI_PALETTE[Math.floor(Math.random() * CONFETTI_PALETTE.length)]
+    }
+    if (d.color !== '#ffffff' && !d.wasMovedByMouse && elapsed >= d.resetAt) {
+      d.color = '#ffffff'
+    }
+    if (elapsed < d.resetAt) stillActive = true
+  }
+
+  entranceActive = stillActive
+}
+
+function animate() {
+  const canvas = canvasRef.value
+  const ctx = canvas?.getContext('2d')
+  if (!canvas || !ctx) return
+  stepEntrance()
+  ctx.clearRect(0, 0, canvasWidth, canvasHeight)
+  for (const d of dots) {
+    updateDot(d)
+    drawDot(ctx, d)
+  }
+  rafId = requestAnimationFrame(animate)
+}
+
+function drawStaticFrame() {
+  const canvas = canvasRef.value
+  const ctx = canvas?.getContext('2d')
+  if (!canvas || !ctx) return
+  ctx.clearRect(0, 0, canvasWidth, canvasHeight)
+  for (const d of dots) {
+    drawDot(ctx, d)
+  }
+}
+
+function scheduleResize() {
+  if (resizePending) return
+  resizePending = true
+  requestAnimationFrame(() => {
+    resizePending = false
+    void rasterizeText(false)
+  })
+}
+
+function handlePointerMove(e: PointerEvent) {
+  const card = cardRef.value
+  if (!card) return
+  const rect = card.getBoundingClientRect()
+  mouse.x = e.clientX - rect.left
+  mouse.y = e.clientY - rect.top
+  maybeEmitGlyphs(mouse.x, mouse.y)
+}
+
+function handlePointerLeave() {
+  mouse.x = -9999
+  mouse.y = -9999
+}
+
+function handleMotionPrefChange(e: MediaQueryListEvent) {
+  prefersReducedMotion = e.matches
+  if (prefersReducedMotion) {
+    if (rafId !== null) {
+      cancelAnimationFrame(rafId)
+      rafId = null
+    }
+    for (const d of dots) d.opacity = 1
+    drawStaticFrame()
+    clearAllGlyphs()
+  } else if (rafId === null) {
+    rafId = requestAnimationFrame(animate)
+  }
+}
+
+onMounted(async () => {
+  resolveConfettiPalette()
+
+  mql = window.matchMedia('(prefers-reduced-motion: reduce)')
+  prefersReducedMotion = mql.matches
+  mql.addEventListener('change', handleMotionPrefChange)
+
+  const card = cardRef.value
+  const spacer = spacerRef.value
+  if (!card || !spacer) return
+
+  await rasterizeText(true)
+
+  resizeObserver = new ResizeObserver(scheduleResize)
+  resizeObserver.observe(card)
+
+  card.addEventListener('pointermove', handlePointerMove)
+  card.addEventListener('pointerleave', handlePointerLeave)
+
+  if (prefersReducedMotion) {
+    hasRevealed = true
+    for (const d of dots) d.opacity = 1
+    drawStaticFrame()
+  } else {
+    entranceObserver = new IntersectionObserver(
+      (entries) => {
+        if (entries.some((entry) => entry.isIntersecting)) {
+          hasRevealed = true
+          scheduleEntranceReveal()
+          entranceObserver?.disconnect()
+        }
+      },
+      { threshold: 0.1 },
+    )
+    entranceObserver.observe(spacer)
+    rafId = requestAnimationFrame(animate)
+  }
+})
+
+onUnmounted(() => {
+  if (rafId !== null) cancelAnimationFrame(rafId)
+  resizeObserver?.disconnect()
+  entranceObserver?.disconnect()
+  const card = cardRef.value
+  card?.removeEventListener('pointermove', handlePointerMove)
+  card?.removeEventListener('pointerleave', handlePointerLeave)
+  mql?.removeEventListener('change', handleMotionPrefChange)
+  clearAllGlyphs()
+})
+</script>
+
+<template>
+  <footer class="px-5 py-12 sm:px-8 sm:py-16">
+    <div class="mx-auto max-w-[1200px]">
+      <div
+        ref="cardRef"
+        class="relative overflow-hidden rounded-3xl bg-brand text-white shadow-2xl"
+      >
+        <canvas ref="canvasRef" class="pointer-events-none absolute inset-0 z-0 h-full w-full" aria-hidden="true" />
+
+        <div class="pointer-events-none absolute inset-0 z-0" aria-hidden="true">
+          <span
+            v-for="g in glyphs"
+            :key="g.id"
+            class="glyph-particle"
+            :style="{
+              left: `${g.x}px`,
+              top: `${g.y}px`,
+              color: g.color,
+              fontSize: `${g.fontSize}px`,
+              '--rot': `${g.rot}deg`,
+            }"
+            >{{ g.char }}</span
+          >
+        </div>
+
+        <div
+          class="relative z-10 flex flex-col gap-10 px-6 pt-10 sm:flex-row sm:items-start sm:justify-between sm:px-12 sm:pt-14"
+        >
+          <div class="max-w-sm">
+            <div
+              class="flex items-center gap-2 font-mono text-[11px] font-bold tracking-[0.14em] text-white/70 uppercase"
+            >
+              <span class="size-1.5 rounded-full bg-white/70" aria-hidden="true" />
+              Straight from the canvas
+            </div>
+            <p class="mt-4 text-[17px] leading-snug font-medium text-white sm:text-[19px]">
+              Design in Figma. Export real markup. Check the inbox before you send.
+            </p>
+            <a
+              :href="site.editorUrl"
+              class="mt-6 inline-flex items-center gap-1.5 text-[14px] font-semibold text-white underline decoration-white/40 underline-offset-4 transition-colors hover:decoration-white"
+            >
+              Try the editor
+              <Icon name="arrow-right" class="size-4" />
+            </a>
+          </div>
+
+          <div>
+            <div
+              class="flex items-center gap-2 font-mono text-[11px] font-bold tracking-[0.14em] text-white/70 uppercase"
+            >
+              <span class="size-1.5 rounded-full bg-white/70" aria-hidden="true" />
+              Explore
+            </div>
+            <ul class="mt-4 flex flex-col gap-3">
+              <li v-for="item in navLinks" :key="item.href">
+                <a
+                  :href="item.href"
+                  class="group flex items-center gap-1.5 text-[14px] text-white/80 transition-colors hover:text-white"
+                >
+                  <span>{{ item.label }}</span>
+                  <Icon
+                    name="chevron-right"
+                    class="size-3.5 opacity-60 transition-transform group-hover:translate-x-0.5"
+                  />
+                </a>
+              </li>
+            </ul>
+          </div>
+        </div>
+
+        <div ref="spacerRef" class="mt-10 h-[220px] w-full sm:h-[300px] lg:h-[380px]" aria-hidden="true" />
+
+        <div
+          class="relative z-10 flex items-center justify-between border-t border-white/15 px-6 py-5 text-[13px] text-white/60 sm:px-12"
+        >
+          <span>© {{ year }} {{ site.name }}</span>
+          <a :href="site.loginUrl" class="transition-colors hover:text-white">Log in</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+</template>
+
+<style scoped>
+.glyph-particle {
+  position: absolute;
+  pointer-events: none;
+  transform: translate(-50%, -50%);
+  animation: flicker 350ms steps(1, end) forwards;
+}
+
+@keyframes flicker {
+  0% {
+    opacity: 0.75;
+    transform: translate(-50%, -50%) scale(1);
+  }
+  50% {
+    opacity: 0.9;
+    transform: translate(-50%, -50%) scale(1.05);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.95);
+  }
+}
+</style>
