@@ -1,8 +1,12 @@
 <script setup lang="ts">
 import SiteHeader from '@/components/SiteHeader.vue'
 import HeroSection from '@/components/HeroSection.vue'
+import CompatibilityBar from '@/components/CompatibilityBar.vue'
 import FeatureGrid from '@/components/FeatureGrid.vue'
 import AudienceRow from '@/components/AudienceRow.vue'
+import TemplateGallery from '@/components/TemplateGallery.vue'
+import Testimonials from '@/components/Testimonials.vue'
+import StatsBand from '@/components/StatsBand.vue'
 import FooterCta from '@/components/FooterCta.vue'
 import SiteFooter from '@/components/SiteFooter.vue'
 </script>
@@ -12,8 +16,12 @@ import SiteFooter from '@/components/SiteFooter.vue'
     <SiteHeader />
     <main>
       <HeroSection />
+      <CompatibilityBar />
       <FeatureGrid />
       <AudienceRow />
+      <TemplateGallery />
+      <Testimonials />
+      <StatsBand />
       <FooterCta />
     </main>
     <SiteFooter />

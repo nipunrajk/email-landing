@@ -423,8 +423,8 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <footer class="px-5 py-12 sm:px-8 sm:py-16">
-    <div class="mx-auto max-w-[1200px]">
+  <footer class="py-12 sm:py-16">
+    <div class="shell">
       <div
         ref="cardRef"
         class="relative overflow-hidden rounded-3xl bg-brand text-white shadow-2xl"

@@ -48,15 +48,17 @@ const paths: Record<string, string[]> = {
   moon: ['M20 14.5A8.5 8.5 0 0 1 9.5 4a8.5 8.5 0 1 0 10.5 10.5Z'],
   ruler: ['M4 14 14 4l6 6L10 20z', 'M8 8l2 2', 'M11 5l2 2', 'M5 11l2 2'],
   eye: ['M2.5 12S6 5.5 12 5.5 21.5 12 21.5 12 18 18.5 12 18.5 2.5 12 2.5 12Z', 'M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z'],
+  star: ['M12 3.5l2.6 5.5 6 .9-4.3 4.2 1 6-5.3-2.8-5.3 2.8 1-6L3.4 9.9l6-.9z'],
+  'trending-up': ['M3.5 16.5 9.5 10.5l4 4 7-7', 'M15 7.5h5.5V13'],
 }
 
-defineProps<{ name: string }>()
+withDefaults(defineProps<{ name: string; filled?: boolean }>(), { filled: false })
 </script>
 
 <template>
   <svg
     viewBox="0 0 24 24"
-    fill="none"
+    :fill="filled ? 'currentColor' : 'none'"
     stroke="currentColor"
     stroke-width="1.75"
     stroke-linecap="round"

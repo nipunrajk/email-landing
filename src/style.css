@@ -54,6 +54,33 @@ button:focus-visible {
   border-radius: 6px;
 }
 
+/* Single source of truth for page gutters — every section uses this so the
+   content column stays aligned from the header through to the footer. */
+.shell {
+  width: 100%;
+  max-width: 1440px;
+  margin-inline: auto;
+  padding-inline: 1.25rem;
+}
+
+@media (min-width: 640px) {
+  .shell {
+    padding-inline: 2rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .shell {
+    padding-inline: 2.5rem;
+  }
+}
+
+@media (min-width: 1280px) {
+  .shell {
+    padding-inline: 4rem;
+  }
+}
+
 .btn {
   display: inline-flex;
   align-items: center;

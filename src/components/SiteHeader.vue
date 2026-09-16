@@ -13,7 +13,7 @@ const nav = [
 <template>
   <header class="sticky top-0 z-50 border-b border-line bg-surface/90 backdrop-blur-md">
     <div
-      class="mx-auto flex h-16 max-w-[1200px] items-center justify-between gap-4 px-5 sm:h-20 sm:px-8"
+      class="shell flex h-16 items-center justify-between gap-4 sm:h-20"
     >
       <a href="#top" class="flex items-center gap-3 text-ink">
         <span

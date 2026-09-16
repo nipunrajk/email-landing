@@ -7,7 +7,7 @@ const facts = ['Figma frame import', 'HTML · MJML · React Email · Blade', 'Pr
 </script>
 
 <template>
-  <section class="relative overflow-hidden px-5 pt-12 pb-16 sm:px-8 sm:pt-16 sm:pb-24">
+  <section class="relative overflow-hidden pt-12 pb-16 sm:pt-16 sm:pb-24">
     <div
       class="pointer-events-none absolute inset-x-0 top-0 -z-10 flex justify-center"
       aria-hidden="true"
@@ -17,7 +17,7 @@ const facts = ['Figma frame import', 'HTML · MJML · React Email · Blade', 'Pr
       />
     </div>
 
-    <div class="mx-auto max-w-[1200px]">
+    <div class="shell">
       <div class="text-center">
         <a
           href="#product"
@@ -33,7 +33,7 @@ const facts = ['Figma frame import', 'HTML · MJML · React Email · Blade', 'Pr
         </a>
 
         <h1
-          class="mx-auto mt-8 max-w-[860px] font-display text-[38px] leading-[1.05] font-extrabold tracking-[-0.03em] sm:text-[56px]"
+          class="mx-auto mt-8 max-w-[900px] font-display text-[38px] leading-[1.05] font-extrabold tracking-[-0.03em] sm:text-[56px] xl:text-[64px]"
         >
           Design in Figma.
           <span class="bg-gradient-to-r from-brand to-brand-bright bg-clip-text text-transparent">

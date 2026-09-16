@@ -4,8 +4,8 @@ import Icon from '@/components/Icon.vue'
 </script>
 
 <template>
-  <section class="px-5 py-20 sm:px-8 sm:py-24">
-    <div class="mx-auto max-w-[1200px]">
+  <section class="py-20 sm:py-24 xl:py-28">
+    <div class="shell">
       <div
         class="relative overflow-hidden rounded-3xl bg-gradient-to-br from-ink via-[#1b2a33] to-ink px-6 py-14 text-center sm:px-16 sm:py-20"
       >

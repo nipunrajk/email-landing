@@ -23,9 +23,9 @@ const audiences = [
 <template>
   <section
     id="audiences"
-    class="scroll-mt-24 border-y border-line bg-surface px-5 py-20 sm:px-8 sm:py-24"
+    class="scroll-mt-24 border-y border-line bg-surface py-20 sm:py-24 xl:py-28"
   >
-    <div class="mx-auto max-w-[1200px]">
+    <div class="shell">
       <div class="mx-auto mb-14 max-w-[620px] text-center">
         <span
           class="rounded-full bg-mint-soft px-3.5 py-1 text-[11px] font-bold tracking-[0.08em] text-mint uppercase"
