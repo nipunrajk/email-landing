@@ -26,17 +26,19 @@ const audiences = [
     class="scroll-mt-24 border-y border-line bg-surface py-20 sm:py-24 xl:py-28"
   >
     <div class="shell">
-      <div class="mx-auto mb-14 max-w-[620px] text-center">
-        <span
-          class="rounded-full bg-mint-soft px-3.5 py-1 text-[11px] font-bold tracking-[0.08em] text-mint uppercase"
-        >
-          Who it’s for
-        </span>
-        <h2
-          class="mt-4 font-display text-[30px] leading-[1.12] font-bold tracking-[-0.025em] sm:text-[40px]"
-        >
-          One canvas, three sets of expectations
-        </h2>
+      <div class="mb-14 border-t border-line-strong pt-6 sm:mb-16">
+        <div class="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+          <h2
+            class="font-display text-[30px] leading-[1.12] font-bold tracking-[-0.025em] sm:text-[40px]"
+          >
+            One canvas, three sets of expectations
+          </h2>
+          <span
+            class="font-mono text-[12px] font-bold tracking-[0.12em] text-mint uppercase sm:pb-1.5"
+          >
+            Who it’s for
+          </span>
+        </div>
       </div>
 
       <div class="grid gap-6 md:grid-cols-3">

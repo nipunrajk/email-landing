@@ -15,6 +15,9 @@ function handleTrialSubmit() {
 
 const year = new Date().getFullYear()
 
+// Product capabilities, not trial/pricing terms — nothing here needs sourcing.
+const facts = ['Figma frame import', 'HTML · MJML · React Email · Blade', 'Pre-send inbox checks']
+
 const cardRef = useTemplateRef<HTMLDivElement>('cardRef')
 const spacerRef = useTemplateRef<HTMLDivElement>('spacerRef')
 const canvasRef = useTemplateRef<HTMLCanvasElement>('canvasRef')
@@ -81,12 +84,12 @@ function resolveColor(varName: string, fallback: string): string {
 function resolveConfettiPalette() {
   CONFETTI_PALETTE = [
     '#ffffff',
-    resolveColor('--color-brand-bright', '#7747ff'),
-    resolveColor('--color-tint', '#f3f0ff'),
-    resolveColor('--color-mint', '#00641d'),
-    resolveColor('--color-mint-soft', '#e9f8ed'),
-    resolveColor('--color-coral', '#b6191a'),
-    resolveColor('--color-coral-soft', '#fce2e6'),
+    resolveColor('--color-brand-bright', '#a78bfa'),
+    resolveColor('--color-tint', '#ede9fe'),
+    resolveColor('--color-mint', '#2d6a4a'),
+    resolveColor('--color-mint-soft', '#e2efe7'),
+    resolveColor('--color-coral', '#9a4527'),
+    resolveColor('--color-coral-soft', '#f5e4dc'),
   ]
 }
 
@@ -165,7 +168,7 @@ function maybeEmitGlyphs(x: number, y: number) {
   const isMobile = canvasWidth < 480
   const count = 1 + Math.floor(Math.random() * 3)
   const fontSize = isMobile ? 6 : 16
-  const glyphPalette = ['#3B673B', '#682C4B', 'rgba(255,255,255,0.45)']
+  const glyphPalette = ['#a78bfa', '#6e44ff', 'rgba(255,255,255,0.45)']
 
   for (let i = 0; i < count; i++) {
     const angle = Math.random() * Math.PI * 2
@@ -431,7 +434,7 @@ onUnmounted(() => {
     <div class="shell">
       <div
         ref="cardRef"
-        class="relative overflow-hidden rounded-3xl bg-gradient-to-b from-[#0b0f19] via-[#11132a] to-[#1c0f3d] text-white shadow-2xl"
+        class="relative overflow-hidden rounded-3xl bg-ink-deep text-white shadow-2xl"
       >
         <div
           class="pointer-events-none absolute -top-40 left-1/2 z-0 size-[560px] -translate-x-1/2 rounded-full bg-brand/20 blur-3xl"
@@ -461,17 +464,18 @@ onUnmounted(() => {
             class="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/[0.06] px-4 py-1.5 text-[12px] font-medium text-white/80 backdrop-blur-md"
           >
             <span class="size-1.5 rounded-full bg-white/70" aria-hidden="true" />
-            <span>Instant Free Trial — No Credit Card Required</span>
+            <span>Open the editor — no install, no setup</span>
           </div>
 
           <h2
             class="mt-6 font-display text-[36px] leading-[1.06] font-extrabold tracking-[-0.035em] text-white sm:text-[50px] lg:text-[58px]"
           >
-            Ready to elevate your email marketing?
+            Take a Figma frame all the way to the inbox.
           </h2>
 
           <p class="mx-auto mt-4 max-w-xl text-[16px] leading-relaxed text-white/70 sm:text-[18px]">
-            Join 45,000+ top marketing teams building interactive, compliant, and beautifully rendered emails today.
+            Import the frame, keep every block editable, export the format your stack already uses
+            — then check it before you send.
           </p>
 
           <form
@@ -484,12 +488,12 @@ onUnmounted(() => {
                 type="email"
                 placeholder="Enter your work email..."
                 required
-                class="h-12 w-full rounded-xl border border-white/15 bg-[#0f172a]/70 px-4 text-[14px] text-white placeholder-white/40 shadow-inner backdrop-blur-sm transition-colors focus:border-brand-bright focus:bg-[#0f172a]/95 focus:outline-none focus:ring-2 focus:ring-brand-bright/30"
+                class="h-12 w-full rounded-xl border border-white/15 bg-white/5 px-4 text-[14px] text-white placeholder-white/40 shadow-inner backdrop-blur-sm transition-colors focus:border-brand-bright focus:bg-white/10 focus:outline-none focus:ring-2 focus:ring-brand-bright/30"
               />
             </div>
             <button
               type="submit"
-              class="inline-flex h-12 w-full items-center justify-center gap-2 rounded-xl bg-[#5e23e6] px-6 text-[14px] font-semibold text-white shadow-[0_4px_20px_rgba(94,35,230,0.5)] transition-all hover:bg-[#6c32ec] hover:shadow-[0_6px_24px_rgba(94,35,230,0.65)] active:scale-[0.98] sm:w-auto"
+              class="inline-flex h-12 w-full items-center justify-center gap-2 rounded-xl bg-brand px-6 text-[14px] font-semibold text-white shadow-[0_4px_20px_rgba(110,68,255,0.45)] transition-all hover:bg-brand-deep hover:shadow-[0_6px_24px_rgba(110,68,255,0.6)] active:scale-[0.98] sm:w-auto"
             >
               <span>Start Free Trial</span>
               <Icon name="arrow-right" class="size-4" />
@@ -497,17 +501,9 @@ onUnmounted(() => {
           </form>
 
           <div class="mt-6 flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-[12px] text-white/60">
-            <span class="inline-flex items-center gap-1.5">
-              <Icon name="check" class="size-3.5 text-emerald-400" />
-              <span>14-day free trial</span>
-            </span>
-            <span class="inline-flex items-center gap-1.5">
-              <Icon name="check" class="size-3.5 text-emerald-400" />
-              <span>Unlimited HTML exports</span>
-            </span>
-            <span class="inline-flex items-center gap-1.5">
-              <Icon name="check" class="size-3.5 text-emerald-400" />
-              <span>Direct ESP sync</span>
+            <span v-for="fact in facts" :key="fact" class="inline-flex items-center gap-1.5">
+              <Icon name="check" class="size-3.5 text-brand-bright" />
+              <span>{{ fact }}</span>
             </span>
           </div>
         </div>

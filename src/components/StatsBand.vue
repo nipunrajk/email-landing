@@ -1,25 +1,25 @@
 <script setup lang="ts">
-// These three are product facts, not performance claims — each one is verifiable
-// from what Getdraft actually does, so this section is safe to ship as-is.
-// Swap in business metrics later only if you can source them.
+// Three product facts. The numbers (4, 3, 0) aren't impressive at scale, so they
+// stay inline within a sentence rather than blown up as hero digits — the claim
+// carries the section, not the numeral.
 const stats = [
   {
+    lead: 'Export to',
     value: '4',
-    label: 'Export formats',
+    tail: 'formats',
     note: 'HTML, MJML, React Email and Blade — one canvas, four outputs.',
-    accent: true,
   },
   {
+    lead: 'Catch',
     value: '3',
-    label: 'Pre-send checks',
-    note: 'Gmail clipping, Outlook spacing and risky CSS, caught on the canvas.',
-    accent: false,
+    tail: 'failure points',
+    note: 'Gmail clipping, Outlook spacing and risky CSS, before you send.',
   },
   {
+    lead: 'Inherit',
     value: '0',
-    label: 'Nested-table exports',
-    note: 'Readable markup you can commit and diff, not an artifact to inherit.',
-    accent: true,
+    tail: 'nested tables',
+    note: 'Readable markup you can commit and diff, not an artifact to maintain.',
   },
 ]
 </script>
@@ -27,16 +27,14 @@ const stats = [
 <template>
   <section class="border-y border-line bg-surface py-16 xl:py-20">
     <div class="shell">
-      <div class="grid gap-10 divide-line md:grid-cols-3 md:gap-0 md:divide-x">
-        <div v-for="(stat, i) in stats" :key="i" class="px-4 text-center">
+      <div class="grid gap-10 divide-line sm:grid-cols-3 sm:gap-10 sm:divide-x">
+        <div v-for="(stat, i) in stats" :key="i" class="sm:first:pl-0 sm:px-2 sm:last:pr-0">
           <p
-            class="font-display text-[44px] leading-none font-extrabold tracking-[-0.03em] sm:text-[56px]"
-            :class="stat.accent ? 'text-brand' : 'text-ink'"
+            class="font-display text-[21px] leading-snug font-bold tracking-[-0.015em] sm:text-[23px]"
           >
-            {{ stat.value }}
+            {{ stat.lead }} <span class="text-brand">{{ stat.value }}</span> {{ stat.tail }}
           </p>
-          <p class="mt-3 font-display text-[16px] font-bold">{{ stat.label }}</p>
-          <p class="mx-auto mt-1.5 max-w-[280px] text-[13px] leading-relaxed text-muted">
+          <p class="mt-2.5 max-w-[280px] text-[13.5px] leading-relaxed text-muted">
             {{ stat.note }}
           </p>
         </div>

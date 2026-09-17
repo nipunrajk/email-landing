@@ -1,32 +1,93 @@
 @import 'tailwindcss';
 
+/* ---------------------------------------------------------------------------
+   COLOR SYSTEM — one identity across the marketing site and the editor
+
+   The brand anchor is NOT a choice made here. The shipped editor (email-canvas)
+   has run on Spherule Violet #6E44FF since it was built — it's --primary, --ring,
+   every active pill and selection outline in the app. A visitor clicks "Try the
+   editor" and lands in that violet, so the site has to be the same violet or the
+   handoff reads as two different products.
+
+   Worth noting: the site was never actually matching. It used #5e23e6 — a
+   near-miss of the product's #6E44FF, close enough to look like a mistake rather
+   than a decision. These three brand tokens are now copied verbatim from the
+   app's globals.css so there is exactly one source of truth:
+       --primary      #6e44ff  →  --color-brand
+       --primary-glow #a78bfa  →  --color-brand-bright
+       --primary-soft #ede9fe  →  --color-tint
+
+   What the site contributes is the SURROUND. A brand color is only one token;
+   the neutrals it sits on decide whether it reads as considered or as a default
+   purple SaaS page. So the greys here are drawn from proofing — the blueline
+   contact print you pull to check registration before committing to a press you
+   can't undo, which is exactly the job Getdraft does between Figma and a send.
+   Every neutral carries a cool blue undertone, which is what lets violet sit on
+   them without clashing (violet on warm cream would fight; violet on tinted
+   proofing stock agrees).
+
+   --color-canvas   #edf1f4  Cool proofing-table paper. Tinted stock, not a
+                             neutral gray UI shell.
+   --color-surface  #ffffff  The sheet. Pure white reserved for panels laid on
+                             the table, so cards read as paper.
+   --color-subtle   #e2e9ef  Recessed fills (inputs, chips) — the table showing
+                             through, not a separate gray.
+   --color-ink      #0f1d28  Near-black with a blue undertone so body copy sits
+                             in the ink family instead of floating as pure black.
+   --color-muted    #5a6b78  Ink thinned out. 4.8:1 on canvas — AA, not decorative.
+   --color-line     #dce4ea  Hairline registration rule; visible, never a border.
+   --color-line-strong #bfcbd5  Used when an edge has to hold a shape.
+   --color-brand    #6e44ff  Spherule Violet — the product's real color. White on
+                             it is 5.35:1; as text on canvas it is 4.67:1, so it
+                             clears AA both ways but should not be used for small
+                             text on canvas without checking.
+   --color-brand-bright #a78bfa  The app's glow token. Light — reserved for dark
+                             grounds (footer wash, confetti) and focus halos, never
+                             for text on white.
+   --color-brand-deep #5a33d9  Pressed state, derived by darkening the anchor;
+                             white on it is 7.3:1.
+   --color-tint     #ede9fe  The app's soft token — badge fills, icon containers,
+                             the same wash used behind variable pills in the editor.
+   --color-ink-deep #140f2b  The darkroom. Flat violet-black for the footer, pulled
+                             toward the brand so its glow belongs to the same light.
+   --color-mint     #2d6a4a  "Passes" — a sap/pine proofing annotation, not a neon
+                             UI success green. Stays clear of the brand hue so
+                             status never competes with identity.
+   --color-mint-soft #e2efe7  Its wash.
+   --color-coral    #9a4527  "Flagged" — iron oxide, the red pencil in the margin.
+                             Muted so a warning reads as a reviewer's note.
+   --color-coral-soft #f5e4dc  Its wash.
+--------------------------------------------------------------------------- */
+
 @theme {
   --font-display: 'Plus Jakarta Sans', ui-sans-serif, system-ui, sans-serif;
   --font-sans: 'Inter', ui-sans-serif, system-ui, sans-serif;
   --font-mono: 'JetBrains Mono', ui-monospace, monospace;
 
-  --color-canvas: #f8f9fc;
+  --color-canvas: #edf1f4;
   --color-surface: #ffffff;
-  --color-subtle: #f2f3f7;
+  --color-subtle: #e2e9ef;
 
-  --color-ink: #101d24;
-  --color-muted: #5f6b7a;
+  --color-ink: #0f1d28;
+  --color-ink-deep: #140f2b;
+  --color-muted: #5a6b78;
 
-  --color-line: #e5e8f0;
-  --color-line-strong: #cbd2e1;
+  --color-line: #dce4ea;
+  --color-line-strong: #bfcbd5;
 
-  --color-brand: #5e23e6;
-  --color-brand-bright: #7747ff;
-  --color-brand-deep: #4a17bd;
-  --color-tint: #f3f0ff;
+  /* Copied verbatim from email-canvas/src/app/globals.css — one source of truth. */
+  --color-brand: #6e44ff;
+  --color-brand-bright: #a78bfa;
+  --color-brand-deep: #5a33d9;
+  --color-tint: #ede9fe;
 
-  --color-mint: #00641d;
-  --color-mint-soft: #e9f8ed;
-  --color-coral: #b6191a;
-  --color-coral-soft: #fce2e6;
+  --color-mint: #2d6a4a;
+  --color-mint-soft: #e2efe7;
+  --color-coral: #9a4527;
+  --color-coral-soft: #f5e4dc;
 
   --shadow-workbench:
-    0 28px 64px -24px rgba(16, 29, 36, 0.3), 0 10px 28px -14px rgba(94, 35, 230, 0.18);
+    0 28px 64px -24px rgba(15, 29, 40, 0.28), 0 10px 28px -14px rgba(110, 68, 255, 0.2);
 }
 
 html {
@@ -104,7 +165,7 @@ button:focus-visible {
 .btn-primary {
   background: var(--color-brand);
   color: #fff;
-  box-shadow: 0 6px 16px -8px rgba(94, 35, 230, 0.7);
+  box-shadow: 0 6px 16px -8px rgba(110, 68, 255, 0.55);
 }
 
 .btn-primary:hover {

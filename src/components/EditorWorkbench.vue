@@ -18,14 +18,15 @@ function toggleMenu(key: string) {
 
 const FONT_OPTIONS = ['Plus Jakarta', 'Inter', 'Georgia', 'Courier New']
 const SIZE_OPTIONS = ['12', '14', '15', '18', '22', '28']
+// Mirrors the design-token palette so the mockup swatches match the real editor.
 const SWATCHES = [
-  '#101d24',
-  '#5f6b7a',
-  '#5e23e6',
-  '#7747ff',
-  '#00641d',
-  '#b6191a',
-  '#e5e8f0',
+  '#0f1d28',
+  '#5a6b78',
+  '#6e44ff',
+  '#a78bfa',
+  '#2d6a4a',
+  '#9a4527',
+  '#dce4ea',
   '#ffffff',
 ]
 const FONT_STACK: Record<string, string> = {
@@ -101,10 +102,10 @@ function textStyle(key: TextKey) {
 }
 
 const emailStyles = reactive({
-  canvasBg: '#f8f9fc',
+  canvasBg: '#edf1f4',
   emailBg: '#ffffff',
-  textColor: '#5f6b7a',
-  brandColor: '#5e23e6',
+  textColor: '#5a6b78',
+  brandColor: '#6e44ff',
   width: '600px',
   padding: '20px',
   containerIndex: 0,
@@ -229,7 +230,7 @@ const blockSections = reactive<Record<Exclude<Selection, 'none'>, Section[]>>({
       title: 'Style',
       rows: [
         { label: 'Line height', value: '1.6em', options: ['1.4em', '1.6em', '1.8em'] },
-        { label: 'Color', value: '5F6B7A', swatch: '#5f6b7a' },
+        { label: 'Color', value: '5A6B78', swatch: '#5a6b78' },
       ],
     },
   ],
@@ -244,7 +245,7 @@ const blockSections = reactive<Record<Exclude<Selection, 'none'>, Section[]>>({
     {
       title: 'Style',
       rows: [
-        { label: 'Fill', value: '5E23E6', swatch: '#5e23e6' },
+        { label: 'Fill', value: '6E44FF', swatch: '#6e44ff' },
         { label: 'Radius', value: '8px', options: ['0px', '8px', '999px'] },
         { label: 'Width', toggle: ['Auto', 'Full'], activeIndex: 0 },
       ],
@@ -272,7 +273,7 @@ const blockSections = reactive<Record<Exclude<Selection, 'none'>, Section[]>>({
       rows: [
         { label: 'Line', toggle: ['Solid', 'Dashed'], activeIndex: 0 },
         { label: 'Thickness', value: '1px', options: ['1px', '2px', '4px'] },
-        { label: 'Color', value: 'E5E8F0', swatch: '#e5e8f0' },
+        { label: 'Color', value: 'DCE4EA', swatch: '#dce4ea' },
       ],
     },
     {
@@ -292,7 +293,7 @@ const blockSections = reactive<Record<Exclude<Selection, 'none'>, Section[]>>({
       title: 'Style',
       rows: [
         { label: 'Size', value: '24px', options: ['20px', '24px', '32px'] },
-        { label: 'Color', value: '5F6B7A', swatch: '#5f6b7a' },
+        { label: 'Color', value: '5A6B78', swatch: '#5a6b78' },
       ],
     },
   ],
@@ -384,10 +385,8 @@ function chooseSwatch(row: Row, color: string) {
     <div class="flex">
       <aside class="hidden w-64 shrink-0 flex-col border-r border-line bg-surface lg:flex">
         <div class="flex h-[72px] shrink-0 items-center gap-2.5 px-3.5">
-          <span class="grid size-8 shrink-0 place-items-center rounded-full bg-brand/10 text-brand">
-            <BrandMark class="size-5" />
-          </span>
-          <span class="font-display text-[15px] font-bold tracking-[-0.02em]">{{ site.name }}</span>
+          <BrandMark class="size-7" />
+          <span class="font-display text-[15px] font-black tracking-[-0.03em] uppercase text-ink">{{ site.name }}</span>
           <span
             class="ml-auto grid size-6 place-items-center rounded-md border border-line bg-surface text-muted shadow-xs"
           >

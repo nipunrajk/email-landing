@@ -144,18 +144,23 @@ function countFor(category: string) {
 <template>
   <section id="templates" class="scroll-mt-24 border-t border-line py-20 sm:py-24 xl:py-28">
     <div class="shell">
-      <div class="mb-12 flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
-        <div>
+      <div class="mb-12 flex flex-col gap-8 md:flex-row md:items-end md:justify-between">
+        <div class="flex items-end gap-5">
           <span
-            class="rounded-full bg-tint px-3.5 py-1 text-[11px] font-bold tracking-[0.08em] text-brand uppercase"
+            class="font-display text-[56px] leading-none font-extrabold tracking-[-0.03em] text-brand sm:text-[64px]"
           >
-            Template ecosystem
+            {{ templates.length }}
           </span>
-          <h2
-            class="mt-4 max-w-[460px] font-display text-[30px] leading-[1.12] font-bold tracking-[-0.025em] sm:text-[40px]"
-          >
-            Start from {{ templates.length }} tested layouts
-          </h2>
+          <div class="pb-1">
+            <p class="font-mono text-[11px] font-bold tracking-[0.12em] text-muted uppercase">
+              Template ecosystem
+            </p>
+            <h2
+              class="mt-1 max-w-[360px] font-display text-[22px] leading-[1.15] font-bold tracking-[-0.02em] sm:text-[26px]"
+            >
+              Tested layouts, ready to start from
+            </h2>
+          </div>
         </div>
 
         <div class="flex flex-wrap gap-2">

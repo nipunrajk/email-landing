@@ -15,13 +15,9 @@ const nav = [
     <div
       class="shell flex h-16 items-center justify-between gap-4 sm:h-20"
     >
-      <a href="#top" class="flex items-center gap-3 text-ink">
-        <span
-          class="grid size-9 place-items-center rounded-xl bg-brand text-white shadow-sm sm:size-10"
-        >
-          <BrandMark class="size-5 sm:size-6" />
-        </span>
-        <span class="font-display text-[20px] font-extrabold tracking-[-0.03em]">
+      <a href="#top" class="group flex items-center gap-2.5 text-ink transition-opacity hover:opacity-90">
+        <BrandMark class="size-8 sm:size-9 shadow-xs transition-transform duration-200 group-hover:scale-105" />
+        <span class="font-display text-[20px] font-black tracking-[-0.04em] uppercase text-ink sm:text-[22px]">
           {{ site.name }}
         </span>
       </a>

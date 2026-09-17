@@ -35,10 +35,8 @@ const facts = ['Figma frame import', 'HTML · MJML · React Email · Blade', 'Pr
         <h1
           class="mx-auto mt-8 max-w-[900px] font-display text-[38px] leading-[1.05] font-extrabold tracking-[-0.03em] sm:text-[56px] xl:text-[64px]"
         >
-          Design in Figma.
-          <span class="bg-gradient-to-r from-brand to-brand-bright bg-clip-text text-transparent">
-            Ship real email markup.
-          </span>
+          <span class="text-muted">Design in Figma.</span>
+          <span class="text-ink">Ship real email markup.</span>
         </h1>
 
         <p class="mx-auto mt-6 max-w-[620px] text-[17px] leading-relaxed text-muted sm:text-[19px]">

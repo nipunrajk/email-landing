@@ -46,27 +46,30 @@ const toneClass: Record<string, string> = {
 <template>
   <section class="border-t border-line py-20 sm:py-24 xl:py-28">
     <div class="shell">
-      <div class="mx-auto mb-14 max-w-[620px] text-center sm:mb-16">
+      <div class="mb-14 flex flex-col gap-5 sm:mb-16 sm:flex-row sm:items-start sm:gap-8">
         <span
-          class="rounded-full bg-mint-soft px-3.5 py-1 text-[11px] font-bold tracking-[0.08em] text-mint uppercase"
+          class="font-display text-[64px] leading-[0.6] font-black text-mint/25 select-none sm:text-[88px]"
+          aria-hidden="true"
         >
-          Customer stories
+          “
         </span>
-        <h2
-          class="mt-4 font-display text-[30px] leading-[1.12] font-bold tracking-[-0.025em] sm:text-[40px]"
-        >
-          What teams say about Getdraft
-        </h2>
-        <p class="mt-4 text-[16px] leading-relaxed text-muted sm:text-[17px]">
-          Placeholder copy — drop in three real quotes and this section is done.
-        </p>
+        <div class="sm:pt-4">
+          <h2
+            class="font-display text-[30px] leading-[1.12] font-bold tracking-[-0.025em] sm:text-[40px]"
+          >
+            What teams say about Getdraft
+          </h2>
+          <p class="mt-3 max-w-[520px] text-[16px] leading-relaxed text-muted sm:text-[17px]">
+            Placeholder copy — drop in three real quotes and this section is done.
+          </p>
+        </div>
       </div>
 
-      <div class="grid gap-6 md:grid-cols-3">
+      <div class="grid gap-10 sm:grid-cols-3 sm:gap-8">
         <article
           v-for="(item, i) in testimonials"
           :key="i"
-          class="flex flex-col justify-between rounded-2xl border border-line bg-surface p-7 shadow-sm transition-shadow hover:shadow-md sm:p-8"
+          class="flex flex-col justify-between border-t-2 border-line-strong pt-6"
         >
           <div>
             <span
