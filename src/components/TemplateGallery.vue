@@ -12,7 +12,18 @@ interface Template {
   description: string
   category: string
   layout: Layout
-  meta: [string, string]
+}
+
+// Architecture/verification claims are properties of the layout family, not any
+// one template, so they're derived once here rather than repeated 15 times —
+// every hero-layout template genuinely does share the same column structure.
+// "-Safe" / "-Ready" phrasing on purpose: these describe how the layout is built,
+// not a completed QA event we can't actually claim happened.
+const layoutSpecs: Record<Layout, { spec: string; verified: string }> = {
+  hero: { spec: '600px Single-Column', verified: 'Dark Mode Ready' },
+  grid: { spec: '600px · 2-Column Grid', verified: 'Clip-Safe (<102KB)' },
+  article: { spec: '600px Editorial Column', verified: 'Outlook-Safe Markup' },
+  list: { spec: '600px Editorial Column', verified: 'Outlook-Safe Markup' },
 }
 
 const templates: Template[] = [
@@ -21,105 +32,90 @@ const templates: Template[] = [
     description: 'Onboard new users with a hero, headline, button, and features.',
     category: 'SaaS',
     layout: 'hero',
-    meta: ['Hero + features', 'Dark mode ready'],
   },
   {
     name: 'Product showcase',
     description: 'A modern retail email: lifestyle hero, a two-by-two product grid, and a promo code.',
     category: 'E-commerce',
     layout: 'grid',
-    meta: ['2×2 product grid', 'Promo code'],
   },
   {
     name: 'Monthly digest',
     description: 'A company roundup: intro note, lead story with image, linked stories, stats highlight.',
     category: 'Newsletter',
     layout: 'list',
-    meta: ['Lead story', 'Stats highlight'],
   },
   {
     name: 'Abandoned Cart',
     description: 'Remind shoppers about the items they left behind, with a product grid and CTA.',
     category: 'E-commerce',
     layout: 'grid',
-    meta: ['Product grid', 'Responsive'],
   },
   {
     name: 'Promo',
     description: 'Bold promotional email with a full-width hero, big headline, and single CTA.',
     category: 'E-commerce',
     layout: 'hero',
-    meta: ['Big hero', 'Single CTA'],
   },
   {
     name: 'Receipt',
     description: 'Order confirmation with line items, totals, and a footer summary.',
     category: 'E-commerce',
     layout: 'list',
-    meta: ['Line items', 'Transactional'],
   },
   {
     name: 'Product update',
     description: 'A polished SaaS release: dark hero, screenshot, feature cards, stats, social footer.',
     category: 'SaaS',
     layout: 'hero',
-    meta: ['Dark hero', 'Feature cards'],
   },
   {
     name: 'Welcome email',
     description: 'A warm onboarding welcome with a single clear call to action.',
     category: 'SaaS',
     layout: 'hero',
-    meta: ['Single CTA', 'Dark mode ready'],
   },
   {
     name: 'Product launch',
     description: 'Announce a new product or feature with an image, benefits, and a strong CTA.',
     category: 'SaaS',
     layout: 'article',
-    meta: ['Benefits + CTA', 'Dark mode ready'],
   },
   {
     name: 'Newsletter',
     description: 'A clean weekly newsletter with a featured story, two article teasers, and a footer.',
     category: 'Newsletter',
     layout: 'list',
-    meta: ['3 stories', 'Responsive'],
   },
   {
     name: 'Article post',
     description: 'A Substack-style article email: title, author line, reaction row, and long-form body.',
     category: 'Newsletter',
     layout: 'article',
-    meta: ['Long-form', 'Reaction row'],
   },
   {
     name: 'Arabic newsletter',
     description: 'A weekly newsletter in Arabic: featured story, two teasers, and a footer.',
     category: 'Newsletter',
     layout: 'list',
-    meta: ['RTL layout', '3 stories'],
   },
   {
     name: 'Urdu article digest',
     description: 'A Medium-style digest in Urdu: three recommended reads with thumbnails and read times.',
     category: 'Newsletter',
     layout: 'list',
-    meta: ['RTL layout', 'Thumbnails'],
   },
   {
     name: 'Event invitation',
     description: 'An elegant event or webinar invite: date badge, agenda, speakers, and an RSVP button.',
     category: 'Campaigns',
     layout: 'article',
-    meta: ['Agenda + RSVP', 'Date badge'],
   },
   {
     name: 'Brand story',
     description: 'An editorial, minimalist campaign email: full-bleed hero, generous type, one CTA.',
     category: 'Campaigns',
     layout: 'hero',
-    meta: ['Full-bleed hero', 'Single CTA'],
   },
 ]
 
@@ -139,28 +135,31 @@ function countFor(category: string) {
     ? templates.length
     : templates.filter((t) => t.category === category).length
 }
+
+function monogram(name: string) {
+  return name.charAt(0).toUpperCase()
+}
 </script>
 
 <template>
   <section id="templates" class="scroll-mt-24 border-t border-line py-20 sm:py-24 xl:py-28">
     <div class="shell">
       <div class="mb-12 flex flex-col gap-8 md:flex-row md:items-end md:justify-between">
-        <div class="flex items-end gap-5">
+        <div class="max-w-[460px]">
           <span
-            class="font-display text-[56px] leading-none font-extrabold tracking-[-0.03em] text-brand sm:text-[64px]"
+            class="inline-flex items-center gap-1.5 rounded-full bg-tint px-3 py-1 font-mono text-[11px] font-bold tracking-[0.08em] text-brand uppercase"
           >
-            {{ templates.length }}
+            Template ecosystem
           </span>
-          <div class="pb-1">
-            <p class="font-mono text-[11px] font-bold tracking-[0.12em] text-muted uppercase">
-              Template ecosystem
-            </p>
-            <h2
-              class="mt-1 max-w-[360px] font-display text-[22px] leading-[1.15] font-bold tracking-[-0.02em] text-balance sm:text-[26px]"
-            >
-              Tested layouts, ready to start from
-            </h2>
-          </div>
+          <h2
+            class="mt-3 font-display text-[30px] leading-[1.12] font-bold tracking-[-0.025em] text-balance sm:text-[40px]"
+          >
+            Tested layouts, ready to ship
+          </h2>
+          <p class="mt-3 text-[15px] leading-relaxed text-muted text-balance">
+            Production email architectures built for 600px grids, automatic dark mode, and zero
+            Outlook clipping.
+          </p>
         </div>
 
         <div class="flex flex-wrap gap-2">
@@ -168,7 +167,7 @@ function countFor(category: string) {
             v-for="category in categories"
             :key="category"
             type="button"
-            class="rounded-full border px-4 py-2 text-[13px] font-semibold transition-colors"
+            class="inline-flex items-center gap-1.5 rounded-full border px-4 py-2 text-[13px] font-semibold transition-colors"
             :class="
               activeCategory === category
                 ? 'border-brand bg-brand text-white shadow-sm'
@@ -177,7 +176,12 @@ function countFor(category: string) {
             @click="activeCategory = category"
           >
             {{ category }}
-            <span class="ml-1 opacity-60">{{ countFor(category) }}</span>
+            <span
+              class="rounded-md px-1.5 py-0.5 font-mono text-[11px]"
+              :class="activeCategory === category ? 'bg-white/20 text-white' : 'bg-subtle/80 text-muted'"
+            >
+              {{ countFor(category) }}
+            </span>
           </button>
         </div>
       </div>
@@ -191,79 +195,190 @@ function countFor(category: string) {
         <article
           v-for="tpl in visible"
           :key="tpl.name"
-          class="group flex flex-col overflow-hidden rounded-2xl border border-line bg-surface shadow-sm transition-all duration-200 hover:-translate-y-1 hover:border-line-strong hover:shadow-xl"
+          class="group flex flex-col overflow-hidden rounded-2xl border border-line bg-surface shadow-sm transition-all duration-200 hover:-translate-y-1.5 hover:border-line-strong hover:shadow-[0_20px_40px_-15px_rgba(15,29,40,0.12)]"
         >
-          <div class="relative h-52 overflow-hidden border-b border-line bg-canvas pt-5">
-            <span
-              class="absolute top-3 right-3 z-10 rounded-full bg-surface/90 px-2.5 py-1 text-[11px] font-bold shadow-xs backdrop-blur-sm"
-            >
-              {{ tpl.category }}
-            </span>
+          <div class="relative flex h-64 flex-col items-center overflow-hidden bg-canvas pt-4">
+            <!-- client-chrome strip -->
+            <div class="mb-2.5 flex w-[82%] items-center justify-between">
+              <div class="flex gap-1" aria-hidden="true">
+                <span class="size-1 rounded-full bg-line-strong" />
+                <span class="size-1 rounded-full bg-line-strong" />
+                <span class="size-1 rounded-full bg-line-strong" />
+              </div>
+              <span class="font-mono text-[8px] font-medium tracking-wide text-muted/60">
+                600px · Responsive
+              </span>
+            </div>
 
+            <!-- the email sheet: a genuine inbox header on every layout, so it
+                 reads as a captured email rather than a bare content fragment -->
             <div
-              class="mx-auto h-full w-[74%] rounded-t-lg border border-line bg-surface p-3 shadow-sm transition-all duration-300 group-hover:-translate-y-1 group-hover:scale-[1.03] group-hover:border-line-strong group-hover:shadow-md"
+              class="flex w-[82%] flex-1 flex-col overflow-hidden rounded-t-lg border border-line bg-surface shadow-[0_16px_32px_-12px_rgba(15,29,40,0.18),0_3px_8px_-2px_rgba(15,29,40,0.09)] transition-all duration-300 group-hover:-translate-y-1 group-hover:scale-[1.03]"
             >
-              <template v-if="tpl.layout === 'hero'">
-                <div class="h-16 rounded bg-gradient-to-br from-[#2b3440] via-[#3d4a59] to-[#1d252e]" />
-                <div class="mt-2.5 h-2 w-4/5 rounded bg-subtle" />
-                <div class="mt-1.5 h-2 w-3/5 rounded bg-subtle" />
-                <div class="mt-3 h-4 w-20 rounded bg-brand/80" />
-              </template>
+              <div class="flex shrink-0 items-center justify-between border-b border-line/70 px-2.5 py-1.5">
+                <div class="flex items-center gap-1">
+                  <span
+                    class="grid size-3.5 place-items-center rounded-full bg-ink text-[6px] font-bold text-white"
+                  >
+                    {{ monogram(tpl.name) }}
+                  </span>
+                  <span class="text-[6px] font-bold tracking-wide text-ink/70 uppercase">Studio</span>
+                </div>
+                <span class="text-[5.5px] text-muted/50">View in browser</span>
+              </div>
 
-              <template v-else-if="tpl.layout === 'grid'">
-                <div class="h-10 rounded bg-gradient-to-br from-[#2b3440] to-[#3d4a59]" />
-                <div class="mt-2 grid grid-cols-2 gap-2">
-                  <div v-for="n in 4" :key="n" class="rounded border border-line p-1.5">
-                    <div class="h-6 rounded bg-subtle" />
-                    <div class="mt-1 h-1.5 w-3/4 rounded bg-subtle" />
+              <div class="flex-1 p-2.5">
+                <!-- HERO layout -->
+                <template v-if="tpl.layout === 'hero'">
+                  <div
+                    class="rounded p-2.5"
+                    style="background: radial-gradient(circle at 25% 20%, rgba(255, 255, 255, 0.45), transparent 55%), linear-gradient(135deg, var(--color-tint), #efeaff 45%, var(--color-surface) 100%)"
+                  >
+                    <p class="text-[6px] font-bold tracking-[0.1em] text-brand uppercase">New release</p>
+                    <p class="mt-1 font-display text-[10px] leading-tight font-black text-ink">
+                      Ready to get<br />started?
+                    </p>
+                    <span
+                      class="mt-1.5 inline-flex items-center rounded-full bg-brand px-1.5 py-0.5 text-[6px] font-bold text-white shadow-xs"
+                    >
+                      Get Started →
+                    </span>
                   </div>
-                </div>
-              </template>
 
-              <template v-else-if="tpl.layout === 'article'">
-                <div class="h-2.5 w-2/3 rounded bg-ink/70" />
-                <div class="mt-2 h-1.5 w-1/3 rounded bg-subtle" />
-                <div class="mt-3 space-y-1.5">
-                  <div v-for="n in 6" :key="n" class="h-1.5 rounded bg-subtle" :class="n % 3 === 0 ? 'w-2/3' : 'w-full'" />
-                </div>
-                <div class="mt-3 h-4 w-16 rounded bg-brand/80" />
-              </template>
-
-              <template v-else>
-                <div class="h-2.5 w-1/2 rounded bg-ink/70" />
-                <div class="mt-3 space-y-2.5">
-                  <div v-for="n in 3" :key="n" class="flex gap-2">
-                    <div class="h-8 w-10 shrink-0 rounded bg-subtle" />
-                    <div class="flex-1 space-y-1.5 pt-0.5">
-                      <div class="h-1.5 w-full rounded bg-subtle" />
-                      <div class="h-1.5 w-2/3 rounded bg-subtle" />
+                  <div class="mt-2.5 grid grid-cols-2 gap-2">
+                    <div v-for="n in 2" :key="n" class="flex items-start gap-1">
+                      <span
+                        class="mt-0.5 grid size-3 shrink-0 place-items-center rounded-full"
+                        :class="n === 1 ? 'bg-mint-soft text-mint' : 'bg-tint text-brand'"
+                      >
+                        <Icon :name="n === 1 ? 'check' : 'sparkle'" class="size-[6px]" />
+                      </span>
+                      <div class="w-full space-y-1 pt-0.5">
+                        <div class="h-[3px] w-full rounded-full bg-ink/15" />
+                        <div class="h-[3px] w-2/3 rounded-full bg-ink/10" />
+                      </div>
                     </div>
                   </div>
-                </div>
-              </template>
+                </template>
+
+                <!-- GRID layout -->
+                <template v-else-if="tpl.layout === 'grid'">
+                  <div class="flex items-center justify-between">
+                    <span class="text-[6px] font-bold tracking-wide text-ink/70 uppercase">
+                      New arrivals
+                    </span>
+                    <span class="rounded-full bg-coral-soft px-1.5 py-0.5 text-[6px] font-bold text-coral">
+                      EXTRA20
+                    </span>
+                  </div>
+
+                  <div class="mt-2 grid grid-cols-2 gap-1.5">
+                    <div
+                      v-for="(price, n) in ['120', '68', '95', '44']"
+                      :key="n"
+                      class="rounded border border-line p-1"
+                    >
+                      <div
+                        class="h-8 rounded"
+                        style="background: radial-gradient(circle at 30% 25%, rgba(255, 255, 255, 0.55), transparent 60%), linear-gradient(160deg, var(--color-subtle), #e4e8f0 60%, #d6dce6 100%)"
+                      />
+                      <p class="mt-1 truncate text-[6px] font-semibold text-ink/80">Product {{ n + 1 }}</p>
+                      <div class="mt-0.5 flex items-center justify-between">
+                        <span class="text-[6px] font-bold text-brand">${{ price }}</span>
+                        <span class="rounded-full bg-tint px-1 py-[1px] text-[5.5px] font-bold text-brand">
+                          Add
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                </template>
+
+                <!-- ARTICLE / LIST (editorial) layout -->
+                <template v-else>
+                  <div class="flex items-center justify-between border-b border-line/60 pb-1">
+                    <span class="font-mono text-[6px] font-bold tracking-[0.1em] text-muted/70 uppercase">
+                      Issue №42
+                    </span>
+                    <span class="font-mono text-[6px] text-muted/50">Sept 2026</span>
+                  </div>
+
+                  <div class="mt-2 flex gap-1.5">
+                    <div
+                      class="size-10 shrink-0 rounded"
+                      style="background: radial-gradient(circle at 30% 20%, rgba(255, 255, 255, 0.28), transparent 55%), linear-gradient(140deg, #2b3440, #3d4a59 55%, #1d252e 100%)"
+                    />
+                    <div class="min-w-0 flex-1">
+                      <p class="font-display text-[7.5px] leading-tight font-bold text-ink">
+                        The quarter in review
+                      </p>
+                      <p class="mt-0.5 text-[6px] text-muted/70">By the Getdraft team</p>
+                      <div class="mt-1 space-y-1">
+                        <div class="h-[3px] w-full rounded-full bg-ink/12" />
+                        <div class="h-[3px] w-4/5 rounded-full bg-ink/10" />
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="mt-2.5 space-y-1.5 border-t border-line/60 pt-1.5">
+                    <div v-for="n in 2" :key="n" class="flex items-center gap-1.5">
+                      <div class="size-4 shrink-0 rounded bg-subtle" />
+                      <div class="h-[3px] flex-1 rounded-full bg-ink/12" />
+                    </div>
+                  </div>
+                </template>
+              </div>
+
+              <div class="shrink-0 border-t border-line/60 px-2.5 py-1.5 text-center">
+                <span class="text-[5px] tracking-wide text-muted/40">Unsubscribe · Preferences</span>
+              </div>
+            </div>
+
+            <!-- hover overlay -->
+            <div
+              class="pointer-events-none absolute inset-0 flex items-center justify-center bg-ink/10 opacity-0 backdrop-blur-[2px] transition-all duration-200 group-hover:pointer-events-auto group-hover:opacity-100"
+            >
+              <a
+                :href="site.editorUrl"
+                class="inline-flex items-center gap-1.5 rounded-full border border-line bg-surface px-4 py-2 font-mono text-[11.5px] font-semibold text-ink shadow-md transition-transform hover:scale-105"
+              >
+                Open in Editor
+                <Icon name="arrow-right" class="size-3 text-brand" />
+              </a>
             </div>
           </div>
 
           <div class="flex flex-1 flex-col p-6">
-            <h3 class="font-display text-[17px] font-bold tracking-[-0.01em]">{{ tpl.name }}</h3>
+            <div class="flex items-center justify-between gap-2">
+              <h3 class="font-display text-[17px] font-bold tracking-[-0.01em]">{{ tpl.name }}</h3>
+              <span class="shrink-0 rounded-full bg-subtle px-2 py-0.5 font-mono text-[10px] font-bold text-muted">
+                {{ tpl.category }}
+              </span>
+            </div>
             <p class="mt-1.5 flex-1 text-[13px] leading-relaxed text-muted">
               {{ tpl.description }}
             </p>
-            <div
-              class="mt-5 flex items-center justify-between gap-2 border-t border-line pt-4 text-[12px]"
-            >
-              <span class="truncate text-muted">{{ tpl.meta[0] }}</span>
-              <span class="shrink-0 font-bold text-brand">{{ tpl.meta[1] }}</span>
+            <div class="mt-5 flex items-center justify-between gap-2 border-t border-line pt-4 text-[11.5px]">
+              <span class="font-mono text-muted">{{ layoutSpecs[tpl.layout].spec }}</span>
+              <span class="flex shrink-0 items-center gap-1 font-mono font-semibold text-mint">
+                <Icon name="check" class="size-3" />
+                {{ layoutSpecs[tpl.layout].verified }}
+              </span>
             </div>
           </div>
         </article>
       </TransitionGroup>
 
-      <div class="mt-12 text-center">
-        <a :href="site.editorUrl" class="btn btn-ghost btn-md">
+      <div class="mt-14 flex flex-col items-center gap-3 text-center">
+        <a
+          :href="site.editorUrl"
+          class="inline-flex items-center gap-2 rounded-full border border-line-strong bg-surface px-6 py-3 font-mono text-[13px] font-semibold text-ink shadow-sm transition-all hover:border-brand/40 hover:shadow-md"
+        >
           <span>Browse all {{ templates.length }} templates</span>
-          <Icon name="arrow-right" class="size-4" />
+          <Icon name="arrow-right" class="size-4 text-brand" />
         </a>
+        <p class="text-[13px] text-muted">
+          All {{ templates.length }} templates export to React Email, MJML, HTML, and Blade.
+        </p>
       </div>
     </div>
   </section>
