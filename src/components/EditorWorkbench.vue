@@ -326,7 +326,7 @@ const canvasBgStyle = computed(() => ({
 }))
 
 const frameDims = computed(() => {
-  const w = activeView.value === 'mobile' ? '280' : emailStyles.width.replace('px', '')
+  const w = activeView.value === 'mobile' ? '320' : emailStyles.width.replace('px', '')
   return `${w} × 840 PX`
 })
 
@@ -723,12 +723,12 @@ function chooseSwatch(row: Row, color: string) {
             </div>
 
             <div
-              class="relative flex-1 px-4 py-8 pb-20 transition-colors sm:px-8 sm:py-10 sm:pb-24"
+              class="relative flex min-h-[820px] flex-1 flex-col justify-start px-4 py-8 pb-24 transition-colors sm:min-h-[870px] sm:px-8 sm:py-10 sm:pb-28 lg:min-h-[900px]"
               :style="canvasBgStyle"
             >
               <div
-                class="mx-auto transition-all duration-300 ease-in-out"
-                :style="{ maxWidth: activeView === 'mobile' ? '280px' : `${sheetWidth}px` }"
+                class="mx-auto transition-[max-width] duration-300 ease-in-out"
+                :style="{ maxWidth: activeView === 'mobile' ? '320px' : `${sheetWidth}px` }"
               >
                 <p
                   class="mb-2 pl-0.5 font-mono text-[10px] tracking-wider text-muted/70 select-none"
@@ -737,15 +737,18 @@ function chooseSwatch(row: Row, color: string) {
                 </p>
 
                 <div
-                  class="transition-all duration-300 ease-in-out"
+                  class="border-2 transition-[border-radius,box-shadow,border-color] duration-300 ease-in-out"
                   :class="
                     activeView === 'mobile'
-                      ? 'rounded-[24px] border-2 border-line shadow-xl'
-                      : 'rounded-lg shadow-[0_24px_60px_-15px_rgba(15,29,40,0.18),0_4px_12px_-2px_rgba(15,29,40,0.06),0_0_0_1px_rgba(15,29,40,0.05)]'
+                      ? 'rounded-[24px] border-line shadow-xl'
+                      : 'rounded-lg border-transparent shadow-[0_24px_60px_-15px_rgba(15,29,40,0.18),0_4px_12px_-2px_rgba(15,29,40,0.06),0_0_0_1px_rgba(15,29,40,0.05)]'
                   "
                   :style="{ background: emailStyles.emailBg }"
                 >
-                <div v-if="activeView === 'mobile'" class="flex justify-center pt-2.5">
+                <div
+                  class="flex justify-center overflow-hidden transition-all duration-300"
+                  :class="activeView === 'mobile' ? 'h-6 pt-2.5 opacity-100' : 'h-0 pt-0 opacity-0'"
+                >
                   <span class="h-1.5 w-16 rounded-full bg-line-strong" />
                 </div>
 
@@ -893,25 +896,57 @@ function chooseSwatch(row: Row, color: string) {
                 </div>
 
                 <button
-                  v-if="activeView === 'desktop'"
                   type="button"
-                  class="relative grid w-full cursor-pointer grid-cols-2 gap-4 rounded-lg px-5 pb-5"
-                  :class="ringClass('columns')"
+                  class="relative grid w-full cursor-pointer rounded-lg transition-all"
+                  :class="[
+                    activeView === 'mobile'
+                      ? 'grid-cols-2 gap-2.5 px-3 pb-3'
+                      : 'grid-cols-2 gap-4 px-5 pb-5',
+                    ringClass('columns'),
+                  ]"
                   @click="select('columns')"
                 >
-                  <span class="block rounded-lg border border-line p-3 text-center">
+                  <span
+                    class="block rounded-lg border border-line text-center transition-all"
+                    :class="activeView === 'mobile' ? 'p-2' : 'p-3'"
+                  >
                     <span
-                      class="mb-2 block h-20 rounded bg-gradient-to-br from-subtle to-[#e7eaf2]"
+                      class="mb-2 block rounded bg-gradient-to-br from-subtle to-[#e7eaf2] transition-all"
+                      :class="activeView === 'mobile' ? 'h-14' : 'h-20'"
                     />
-                    <span class="block text-[12px] font-bold">Merino Overcoat</span>
-                    <span class="block text-[11px] text-muted">$320.00</span>
+                    <span
+                      class="block font-bold leading-tight"
+                      :class="activeView === 'mobile' ? 'text-[11px]' : 'text-[12px]'"
+                    >
+                      Merino Overcoat
+                    </span>
+                    <span
+                      class="block text-muted"
+                      :class="activeView === 'mobile' ? 'text-[10px]' : 'text-[11px]'"
+                    >
+                      $320.00
+                    </span>
                   </span>
-                  <span class="block rounded-lg border border-line p-3 text-center">
+                  <span
+                    class="block rounded-lg border border-line text-center transition-all"
+                    :class="activeView === 'mobile' ? 'p-2' : 'p-3'"
+                  >
                     <span
-                      class="mb-2 block h-20 rounded bg-gradient-to-br from-subtle to-[#e7eaf2]"
+                      class="mb-2 block rounded bg-gradient-to-br from-subtle to-[#e7eaf2] transition-all"
+                      :class="activeView === 'mobile' ? 'h-14' : 'h-20'"
                     />
-                    <span class="block text-[12px] font-bold">Ribbed Crewneck</span>
-                    <span class="block text-[11px] text-muted">$185.00</span>
+                    <span
+                      class="block font-bold leading-tight"
+                      :class="activeView === 'mobile' ? 'text-[11px]' : 'text-[12px]'"
+                    >
+                      Ribbed Crewneck
+                    </span>
+                    <span
+                      class="block text-muted"
+                      :class="activeView === 'mobile' ? 'text-[10px]' : 'text-[11px]'"
+                    >
+                      $185.00
+                    </span>
                   </span>
                   <Transition name="select-fade">
                     <span v-if="selected === 'columns'" class="pointer-events-none absolute inset-0">
@@ -929,9 +964,6 @@ function chooseSwatch(row: Row, color: string) {
                     </span>
                   </Transition>
                 </button>
-                <p v-else class="px-5 pb-5 text-center text-[11px] text-muted">
-                  Merino Overcoat · Ribbed Crewneck
-                </p>
 
                 <button
                   type="button"
