@@ -55,59 +55,26 @@
 <style scoped>
 .brand-mark {
   overflow: visible;
-  transition:
-    transform 280ms cubic-bezier(0.34, 1.56, 0.64, 1),
-    filter 280ms ease;
 }
 
 .badge-base {
-  transition: filter 240ms ease;
+  transition: filter 160ms ease;
 }
 
-
-
-.arrow-group {
-  transform-origin: 50px 50px;
-  animation: arrow-enter 500ms cubic-bezier(0.16, 1, 0.3, 1) both;
-  transition: transform 260ms cubic-bezier(0.34, 1.56, 0.64, 1);
-}
-
-@keyframes arrow-enter {
-  0% {
-    opacity: 0;
-    transform: translate(-6px, 6px) scale(0.9);
-  }
-  100% {
-    opacity: 1;
-    transform: translate(0, 0) scale(1);
-  }
-}
-
-:global(.group:hover) .brand-mark,
-.brand-mark:hover {
-  transform: scale(1.05);
-  filter: drop-shadow(0 6px 20px rgba(110, 68, 255, 0.45));
-}
-
-:global(.group:hover) .arrow-group,
-.brand-mark:hover .arrow-group {
-  transform: translate(3.5px, -3.5px);
+:global(.group:hover) .badge-base,
+.brand-mark:hover .badge-base {
+  filter: brightness(1.06);
 }
 
 :global(.group:active) .brand-mark,
 .brand-mark:active {
-  transform: scale(0.96);
-}
-
-:global(.group:active) .arrow-group,
-.brand-mark:active .arrow-group {
-  transform: translate(5px, -5px);
+  transform: scale(0.98);
+  transition: transform 100ms ease;
 }
 
 @media (prefers-reduced-motion: reduce) {
   .brand-mark,
-  .arrow-group {
-    animation: none !important;
+  .badge-base {
     transition: none !important;
     transform: none !important;
   }

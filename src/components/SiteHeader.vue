@@ -4,9 +4,11 @@ import BrandMark from '@/components/BrandMark.vue'
 import Icon from '@/components/Icon.vue'
 
 const nav = [
-  { label: 'Product', href: '#product' },
-  { label: 'Exports', href: '#exports' },
-  { label: 'Who it’s for', href: '#audiences' },
+  { label: 'Product', href: '#product', active: true },
+  { label: 'Templates', href: '#templates' },
+  { label: 'Integrations', href: '#exports' },
+  { label: 'Showcase', href: '#audiences' },
+  { label: 'Pricing', href: '#pricing' },
 ]
 </script>
 
@@ -15,34 +17,42 @@ const nav = [
     <div
       class="shell flex h-16 items-center justify-between gap-4 sm:h-20"
     >
-      <a href="#top" class="group flex items-center gap-2.5 text-ink transition-opacity hover:opacity-90">
-        <BrandMark class="size-8 sm:size-9 shadow-xs transition-transform duration-200 group-hover:scale-105" />
+      <a href="#top" class="group flex items-center gap-2.5 text-ink transition-opacity duration-150 hover:opacity-85">
+        <BrandMark class="size-8 sm:size-9 shadow-xs" />
         <span class="font-display text-[20px] font-black tracking-[-0.04em] uppercase text-ink sm:text-[22px]">
           {{ site.name }}
         </span>
       </a>
 
-      <nav class="hidden items-center gap-8 md:flex">
+      <nav class="hidden items-center gap-7 lg:gap-9 md:flex">
         <a
           v-for="item in nav"
           :key="item.href"
           :href="item.href"
-          class="text-[14px] font-medium text-muted transition-colors hover:text-brand"
+          class="text-[14.5px] transition-colors"
+          :class="
+            item.active
+              ? 'font-semibold text-brand'
+              : 'font-medium text-muted hover:text-ink'
+          "
         >
           {{ item.label }}
         </a>
       </nav>
 
-      <div class="flex items-center gap-1 sm:gap-4">
+      <div class="flex items-center gap-4 sm:gap-6">
         <a
           :href="site.loginUrl"
-          class="px-2 text-[14px] font-semibold text-muted transition-colors hover:text-brand"
+          class="text-[14px] font-medium text-muted transition-colors hover:text-ink"
         >
-          Log in
+          Log In
         </a>
-        <a :href="site.editorUrl" class="btn btn-primary btn-sm">
-          <span>Try the editor</span>
-          <Icon name="arrow-right" class="size-4" />
+        <a
+          :href="site.editorUrl"
+          class="inline-flex h-10 items-center justify-center gap-2 rounded-xl bg-brand px-5 text-[14px] font-semibold text-white shadow-sm transition-all hover:bg-brand-deep active:scale-[0.98]"
+        >
+          <span>Start Building Free</span>
+          <Icon name="arrow-right" class="size-3.5" />
         </a>
       </div>
     </div>
@@ -52,7 +62,12 @@ const nav = [
         v-for="item in nav"
         :key="item.href"
         :href="item.href"
-        class="text-[13px] font-medium whitespace-nowrap text-muted transition-colors hover:text-brand"
+        class="text-[13px] whitespace-nowrap transition-colors"
+        :class="
+          item.active
+            ? 'font-semibold text-brand'
+            : 'font-medium text-muted hover:text-ink'
+        "
       >
         {{ item.label }}
       </a>

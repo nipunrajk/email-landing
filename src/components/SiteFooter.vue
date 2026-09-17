@@ -16,7 +16,7 @@ function handleTrialSubmit() {
 const year = new Date().getFullYear()
 
 // Product capabilities, not trial/pricing terms — nothing here needs sourcing.
-const facts = ['Figma frame import', 'HTML · MJML · React Email · Blade', 'Pre-send inbox checks']
+const facts = ['Figma frame import', 'HTML · MJML · React Email · Blade', 'Verified for Outlook & Gmail']
 
 const cardRef = useTemplateRef<HTMLDivElement>('cardRef')
 const spacerRef = useTemplateRef<HTMLDivElement>('spacerRef')
@@ -430,7 +430,7 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <footer class="py-12 sm:py-16">
+  <footer id="pricing" class="scroll-mt-12 py-12 sm:py-16">
     <div class="shell">
       <div
         ref="cardRef"
@@ -495,7 +495,7 @@ onUnmounted(() => {
               type="submit"
               class="inline-flex h-12 w-full items-center justify-center gap-2 rounded-xl bg-brand px-6 text-[14px] font-semibold text-white shadow-[0_4px_20px_rgba(110,68,255,0.45)] transition-all hover:bg-brand-deep hover:shadow-[0_6px_24px_rgba(110,68,255,0.6)] active:scale-[0.98] sm:w-auto"
             >
-              <span>Start Free Trial</span>
+              <span>Start Building Free</span>
               <Icon name="arrow-right" class="size-4" />
             </button>
           </form>

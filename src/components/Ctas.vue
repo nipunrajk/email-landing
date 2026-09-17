@@ -16,13 +16,13 @@ withDefaults(
     class="flex flex-col gap-3 sm:flex-row sm:items-center"
     :class="align === 'center' ? 'sm:justify-center' : ''"
   >
-    <a :href="site.editorUrl" class="btn btn-primary" :class="`btn-${size}`">
+    <a :href="site.editorUrl" class="btn btn-primary !rounded-xl" :class="`btn-${size}`">
       <Icon name="bolt" class="size-4" />
-      <span>Try the editor</span>
+      <span>Start Building Free</span>
     </a>
-    <a :href="site.loginUrl" class="btn btn-ghost" :class="`btn-${size}`">
-      <span>Log in</span>
-      <Icon name="arrow-right" class="size-4" />
+    <a href="#demo" class="btn btn-ghost !rounded-xl" :class="`btn-${size}`">
+      <Icon name="play-circle" class="size-4 text-brand" />
+      <span>Live Interactive Demo</span>
     </a>
   </div>
 </template>

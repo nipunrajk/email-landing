@@ -3,7 +3,7 @@ import Ctas from '@/components/Ctas.vue'
 import Icon from '@/components/Icon.vue'
 import EditorWorkbench from '@/components/EditorWorkbench.vue'
 
-const facts = ['Figma frame import', 'HTML · MJML · React Email · Blade', 'Pre-send inbox check']
+const facts = ['Figma frame import', 'HTML · MJML · React Email · Blade', 'Verified for Outlook & Gmail']
 </script>
 
 <template>
@@ -58,7 +58,7 @@ const facts = ['Figma frame import', 'HTML · MJML · React Email · Blade', 'Pr
         </ul>
       </div>
 
-      <div class="mt-14">
+      <div id="demo" class="mt-14 scroll-mt-24">
         <EditorWorkbench />
       </div>
     </div>

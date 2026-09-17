@@ -319,6 +319,27 @@ const dividerStyle = computed(() => blockSections.divider[0].rows[0].activeIndex
 const isFullBleed = computed(() => emailStyles.containerIndex === 1)
 const heroPadding = computed(() => (isFullBleed.value ? '0px' : emailStyles.padding))
 
+const canvasBgStyle = computed(() => ({
+  backgroundColor: emailStyles.canvasBg,
+  backgroundImage: 'radial-gradient(circle, var(--color-line-strong) 1px, transparent 1px)',
+  backgroundSize: '24px 24px',
+}))
+
+const frameDims = computed(() => {
+  const w = activeView.value === 'mobile' ? '280' : emailStyles.width.replace('px', '')
+  return `${w} × 840 PX`
+})
+
+const selectionTags: Record<Exclude<Selection, 'none'>, string> = {
+  image: 'IMAGE · 600×160',
+  heading: 'HEADING · H1',
+  text: 'TEXT · BODY',
+  button: 'BUTTON · PRIMARY',
+  columns: 'GRID · 2-COL',
+  divider: 'DIVIDER · LINE',
+  social: 'SOCIAL · ICONS',
+}
+
 function select(target: Selection) {
   selected.value = target
   openMenu.value = null
@@ -330,7 +351,9 @@ function selectFromLibrary(target: Exclude<Selection, 'none'>) {
 }
 
 function ringClass(target: Selection) {
-  return selected.value === target ? 'ring-2 ring-brand ring-offset-2' : ''
+  return selected.value === target
+    ? 'ring-2 ring-brand ring-offset-2'
+    : 'transition-shadow duration-150 hover:ring-1 hover:ring-brand/40'
 }
 
 function chooseOption(row: Row, option: string) {
@@ -377,12 +400,24 @@ function chooseSwatch(row: Row, color: string) {
 </script>
 
 <template>
-  <div
-    class="mx-auto overflow-hidden rounded-2xl border border-line-strong bg-surface text-left shadow-workbench"
-  >
-    <div v-if="openMenu" class="fixed inset-0 z-30" @click="openMenu = null" />
+  <div class="relative">
+    <div
+      class="pointer-events-none absolute -inset-x-8 -inset-y-10 -z-10 bg-gradient-to-b from-brand/12 via-brand/4 to-transparent blur-3xl"
+      aria-hidden="true"
+    />
 
-    <div class="flex">
+    <div
+      class="mx-auto overflow-hidden rounded-2xl border border-line-strong bg-surface text-left shadow-[0_0_0_1px_rgba(255,255,255,0.8)_inset,0_32px_64px_-16px_rgba(15,29,40,0.22)] ring-1 ring-black/[0.04]"
+    >
+      <div v-if="openMenu" class="fixed inset-0 z-30" @click="openMenu = null" />
+
+      <div class="flex h-8 shrink-0 items-center gap-1.5 border-b border-line bg-subtle/60 px-4">
+        <span class="size-2.5 rounded-full bg-[#ff5f57] ring-1 ring-black/10" />
+        <span class="size-2.5 rounded-full bg-[#febc2e] ring-1 ring-black/10" />
+        <span class="size-2.5 rounded-full bg-[#28c840] ring-1 ring-black/10" />
+      </div>
+
+      <div class="flex">
       <aside class="hidden w-64 shrink-0 flex-col border-r border-line bg-surface lg:flex">
         <div class="flex h-[72px] shrink-0 items-center gap-2.5 px-3.5">
           <BrandMark class="size-7" />
@@ -689,20 +724,27 @@ function chooseSwatch(row: Row, color: string) {
 
             <div
               class="relative flex-1 px-4 py-8 pb-20 transition-colors sm:px-8 sm:py-10 sm:pb-24"
-              :style="{ background: emailStyles.canvasBg }"
+              :style="canvasBgStyle"
             >
               <div
                 class="mx-auto transition-all duration-300 ease-in-out"
-                :class="
-                  activeView === 'mobile'
-                    ? 'rounded-[24px] border-2 border-line shadow-xl'
-                    : 'rounded-lg shadow-md'
-                "
-                :style="{
-                  background: emailStyles.emailBg,
-                  maxWidth: activeView === 'mobile' ? '280px' : `${sheetWidth}px`,
-                }"
+                :style="{ maxWidth: activeView === 'mobile' ? '280px' : `${sheetWidth}px` }"
               >
+                <p
+                  class="mb-2 pl-0.5 font-mono text-[10px] tracking-wider text-muted/70 select-none"
+                >
+                  FRAME 12 · {{ frameDims }} · {{ isFullBleed ? 'FULL BLEED' : '100%' }}
+                </p>
+
+                <div
+                  class="transition-all duration-300 ease-in-out"
+                  :class="
+                    activeView === 'mobile'
+                      ? 'rounded-[24px] border-2 border-line shadow-xl'
+                      : 'rounded-lg shadow-[0_24px_60px_-15px_rgba(15,29,40,0.18),0_4px_12px_-2px_rgba(15,29,40,0.06),0_0_0_1px_rgba(15,29,40,0.05)]'
+                  "
+                  :style="{ background: emailStyles.emailBg }"
+                >
                 <div v-if="activeView === 'mobile'" class="flex justify-center pt-2.5">
                   <span class="h-1.5 w-16 rounded-full bg-line-strong" />
                 </div>
@@ -742,14 +784,21 @@ function chooseSwatch(row: Row, color: string) {
                         </span>
                       </span>
                     </span>
-                    <template v-if="selected === 'image'">
-                      <span
-                        v-for="pos in cornerDots"
-                        :key="pos"
-                        class="absolute size-2.5 rounded-full border-2 border-surface bg-brand"
-                        :class="pos"
-                      />
-                    </template>
+                    <Transition name="select-fade">
+                      <span v-if="selected === 'image'" class="pointer-events-none absolute inset-0">
+                        <span
+                          class="pointer-events-none absolute -top-5 left-0 rounded-sm bg-brand px-1.5 py-0.5 font-mono text-[9px] font-bold text-white shadow-xs"
+                        >
+                          {{ selectionTags.image }}
+                        </span>
+                        <span
+                          v-for="pos in cornerDots"
+                          :key="pos"
+                          class="absolute size-2 rounded-[1.5px] border border-white bg-brand shadow-xs"
+                          :class="pos"
+                        />
+                      </span>
+                    </Transition>
                   </button>
                 </div>
 
@@ -765,14 +814,21 @@ function chooseSwatch(row: Row, color: string) {
                     </span>
                     Architectural knitwear &amp; outerwear
                   </span>
-                  <template v-if="selected === 'heading'">
-                    <span
-                      v-for="pos in cornerDots"
-                      :key="pos"
-                      class="absolute size-2.5 rounded-full border-2 border-surface bg-brand"
-                      :class="pos"
-                    />
-                  </template>
+                  <Transition name="select-fade">
+                    <span v-if="selected === 'heading'" class="pointer-events-none absolute inset-0">
+                      <span
+                        class="pointer-events-none absolute -top-5 left-0 rounded-sm bg-brand px-1.5 py-0.5 font-mono text-[9px] font-bold text-white shadow-xs"
+                      >
+                        {{ selectionTags.heading }}
+                      </span>
+                      <span
+                        v-for="pos in cornerDots"
+                        :key="pos"
+                        class="absolute size-2 rounded-[1.5px] border border-white bg-brand shadow-xs"
+                        :class="pos"
+                      />
+                    </span>
+                  </Transition>
                 </button>
 
                 <button
@@ -792,14 +848,21 @@ function chooseSwatch(row: Row, color: string) {
                     Crafted from sustainable deadstock merino. Built for weather that can’t make up
                     its mind.
                   </span>
-                  <template v-if="selected === 'text'">
-                    <span
-                      v-for="pos in cornerDots"
-                      :key="pos"
-                      class="absolute size-2.5 rounded-full border-2 border-surface bg-brand"
-                      :class="pos"
-                    />
-                  </template>
+                  <Transition name="select-fade">
+                    <span v-if="selected === 'text'" class="pointer-events-none absolute inset-0">
+                      <span
+                        class="pointer-events-none absolute -top-5 left-0 rounded-sm bg-brand px-1.5 py-0.5 font-mono text-[9px] font-bold text-white shadow-xs"
+                      >
+                        {{ selectionTags.text }}
+                      </span>
+                      <span
+                        v-for="pos in cornerDots"
+                        :key="pos"
+                        class="absolute size-2 rounded-[1.5px] border border-white bg-brand shadow-xs"
+                        :class="pos"
+                      />
+                    </span>
+                  </Transition>
                 </button>
 
                 <div class="flex justify-center px-5 py-4">
@@ -811,22 +874,29 @@ function chooseSwatch(row: Row, color: string) {
                     @click="select('button')"
                   >
                     Shop the drop
-                    <template v-if="selected === 'button'">
-                      <span
-                        v-for="pos in cornerDots"
-                        :key="pos"
-                        class="absolute size-2.5 rounded-full border-2 border-surface bg-brand"
-                        :class="pos"
-                      />
-                    </template>
+                    <Transition name="select-fade">
+                      <span v-if="selected === 'button'" class="pointer-events-none absolute inset-0">
+                        <span
+                          class="pointer-events-none absolute -top-5 left-0 rounded-sm bg-brand px-1.5 py-0.5 font-mono text-[9px] font-bold text-white shadow-xs"
+                        >
+                          {{ selectionTags.button }}
+                        </span>
+                        <span
+                          v-for="pos in cornerDots"
+                          :key="pos"
+                          class="absolute size-2 rounded-[1.5px] border border-white bg-brand shadow-xs"
+                          :class="pos"
+                        />
+                      </span>
+                    </Transition>
                   </button>
                 </div>
 
                 <button
                   v-if="activeView === 'desktop'"
                   type="button"
-                  class="relative grid w-full cursor-pointer grid-cols-2 gap-4 px-5 pb-5"
-                  :class="selected === 'columns' ? 'rounded-lg ring-2 ring-brand ring-offset-2' : ''"
+                  class="relative grid w-full cursor-pointer grid-cols-2 gap-4 rounded-lg px-5 pb-5"
+                  :class="ringClass('columns')"
                   @click="select('columns')"
                 >
                   <span class="block rounded-lg border border-line p-3 text-center">
@@ -843,14 +913,21 @@ function chooseSwatch(row: Row, color: string) {
                     <span class="block text-[12px] font-bold">Ribbed Crewneck</span>
                     <span class="block text-[11px] text-muted">$185.00</span>
                   </span>
-                  <template v-if="selected === 'columns'">
-                    <span
-                      v-for="pos in cornerDots"
-                      :key="pos"
-                      class="absolute size-2.5 rounded-full border-2 border-surface bg-brand"
-                      :class="pos"
-                    />
-                  </template>
+                  <Transition name="select-fade">
+                    <span v-if="selected === 'columns'" class="pointer-events-none absolute inset-0">
+                      <span
+                        class="pointer-events-none absolute -top-5 left-0 rounded-sm bg-brand px-1.5 py-0.5 font-mono text-[9px] font-bold text-white shadow-xs"
+                      >
+                        {{ selectionTags.columns }}
+                      </span>
+                      <span
+                        v-for="pos in cornerDots"
+                        :key="pos"
+                        class="absolute size-2 rounded-[1.5px] border border-white bg-brand shadow-xs"
+                        :class="pos"
+                      />
+                    </span>
+                  </Transition>
                 </button>
                 <p v-else class="px-5 pb-5 text-center text-[11px] text-muted">
                   Merino Overcoat · Ribbed Crewneck
@@ -866,14 +943,21 @@ function chooseSwatch(row: Row, color: string) {
                     class="block w-full border-line"
                     :class="dividerStyle ? 'border-t-2 border-dashed' : 'border-t'"
                   />
-                  <template v-if="selected === 'divider'">
-                    <span
-                      v-for="pos in cornerDots"
-                      :key="pos"
-                      class="absolute size-2.5 rounded-full border-2 border-surface bg-brand"
-                      :class="pos"
-                    />
-                  </template>
+                  <Transition name="select-fade">
+                    <span v-if="selected === 'divider'" class="pointer-events-none absolute inset-0">
+                      <span
+                        class="pointer-events-none absolute -top-5 left-0 rounded-sm bg-brand px-1.5 py-0.5 font-mono text-[9px] font-bold text-white shadow-xs"
+                      >
+                        {{ selectionTags.divider }}
+                      </span>
+                      <span
+                        v-for="pos in cornerDots"
+                        :key="pos"
+                        class="absolute size-2 rounded-[1.5px] border border-white bg-brand shadow-xs"
+                        :class="pos"
+                      />
+                    </span>
+                  </Transition>
                 </button>
 
                 <button
@@ -889,14 +973,21 @@ function chooseSwatch(row: Row, color: string) {
                   >
                     {{ net }}
                   </span>
-                  <template v-if="selected === 'social'">
-                    <span
-                      v-for="pos in cornerDots"
-                      :key="pos"
-                      class="absolute size-2.5 rounded-full border-2 border-surface bg-brand"
-                      :class="pos"
-                    />
-                  </template>
+                  <Transition name="select-fade">
+                    <span v-if="selected === 'social'" class="pointer-events-none absolute inset-0">
+                      <span
+                        class="pointer-events-none absolute -top-5 left-0 rounded-sm bg-brand px-1.5 py-0.5 font-mono text-[9px] font-bold text-white shadow-xs"
+                      >
+                        {{ selectionTags.social }}
+                      </span>
+                      <span
+                        v-for="pos in cornerDots"
+                        :key="pos"
+                        class="absolute size-2 rounded-[1.5px] border border-white bg-brand shadow-xs"
+                        :class="pos"
+                      />
+                    </span>
+                  </Transition>
                 </button>
 
                 <div
@@ -905,17 +996,18 @@ function chooseSwatch(row: Row, color: string) {
                 >
                   <p class="text-[10px] text-muted">Unsubscribe · Preferences · Privacy</p>
                 </div>
+                </div>
               </div>
 
               <div class="pointer-events-none absolute bottom-5 left-1/2 z-20 -translate-x-1/2">
                 <div
-                  class="pointer-events-auto flex items-center gap-1 rounded-lg border border-line bg-surface p-1 shadow-[0_4px_16px_rgba(16,24,40,0.08)]"
+                  class="pointer-events-auto flex items-center gap-1.5 rounded-full border border-white/70 bg-surface/85 px-2 py-1.5 backdrop-blur-xl shadow-[0_16px_36px_-6px_rgba(15,29,40,0.16),0_2px_8px_rgba(15,29,40,0.06)]"
                 >
-                  <div class="flex rounded-md bg-subtle p-0.5">
+                  <div class="flex rounded-full bg-subtle/80 p-0.5">
                     <button
                       type="button"
-                      class="flex items-center gap-1.5 rounded-[5px] px-2.5 py-1 text-[12px] font-medium transition-colors"
-                      :class="activeView === 'desktop' ? 'bg-ink text-white' : 'text-muted'"
+                      class="flex items-center gap-1.5 rounded-full px-3 py-1 text-[12px] font-semibold transition-all"
+                      :class="activeView === 'desktop' ? 'bg-ink text-white shadow-xs' : 'text-muted hover:text-ink'"
                       @click="activeView = 'desktop'"
                     >
                       <Icon name="desktop" class="size-3.5" />
@@ -923,8 +1015,8 @@ function chooseSwatch(row: Row, color: string) {
                     </button>
                     <button
                       type="button"
-                      class="flex items-center gap-1.5 rounded-[5px] px-2.5 py-1 text-[12px] font-medium transition-colors"
-                      :class="activeView === 'mobile' ? 'bg-ink text-white' : 'text-muted'"
+                      class="flex items-center gap-1.5 rounded-full px-3 py-1 text-[12px] font-semibold transition-all"
+                      :class="activeView === 'mobile' ? 'bg-ink text-white shadow-xs' : 'text-muted hover:text-ink'"
                       @click="activeView = 'mobile'"
                     >
                       <Icon name="mobile" class="size-3.5" />
@@ -932,17 +1024,17 @@ function chooseSwatch(row: Row, color: string) {
                     </button>
                   </div>
                   <span class="mx-0.5 h-4 w-px bg-line" />
-                  <span class="grid size-7 place-items-center rounded-md text-muted">
+                  <span class="grid size-7 place-items-center rounded-full text-muted transition-colors hover:bg-subtle/80 hover:text-ink">
                     <Icon name="moon" class="size-3.5" />
                   </span>
-                  <span class="grid size-7 place-items-center rounded-md text-muted">
+                  <span class="grid size-7 place-items-center rounded-full text-muted transition-colors hover:bg-subtle/80 hover:text-ink">
                     <Icon name="ruler" class="size-3.5" />
                   </span>
-                  <span class="grid size-7 place-items-center rounded-md text-muted">
+                  <span class="grid size-7 place-items-center rounded-full text-muted transition-colors hover:bg-subtle/80 hover:text-ink">
                     <Icon name="eye" class="size-3.5" />
                   </span>
                   <span class="mx-0.5 h-4 w-px bg-line" />
-                  <span class="grid size-7 place-items-center rounded-md text-muted">
+                  <span class="grid size-7 place-items-center rounded-full text-muted transition-colors hover:bg-subtle/80 hover:text-ink">
                     <Icon name="trash" class="size-3.5" />
                   </span>
                 </div>
@@ -952,19 +1044,27 @@ function chooseSwatch(row: Row, color: string) {
 
           <aside class="hidden w-[300px] shrink-0 flex-col border-l border-line bg-surface lg:flex">
             <div class="shrink-0 border-b border-line px-3.5 py-3">
-              <div class="flex h-10 items-center rounded-2xl border border-line bg-subtle p-1">
+              <div class="flex h-10 items-center rounded-xl border border-line bg-subtle p-1">
                 <button
                   type="button"
-                  class="flex h-8 flex-1 items-center justify-center rounded-xl text-[13px] font-semibold transition-colors"
-                  :class="activeTab === 'properties' ? 'bg-brand text-white' : 'text-muted'"
+                  class="flex h-8 flex-1 items-center justify-center rounded-lg text-[13px] transition-colors"
+                  :class="
+                    activeTab === 'properties'
+                      ? 'bg-surface font-semibold text-ink shadow-xs'
+                      : 'font-medium text-muted hover:text-ink'
+                  "
                   @click="activeTab = 'properties'"
                 >
                   Properties
                 </button>
                 <button
                   type="button"
-                  class="flex h-8 flex-1 items-center justify-center rounded-xl text-[13px] font-semibold transition-colors"
-                  :class="activeTab === 'blocks' ? 'bg-brand text-white' : 'text-muted'"
+                  class="flex h-8 flex-1 items-center justify-center rounded-lg text-[13px] transition-colors"
+                  :class="
+                    activeTab === 'blocks'
+                      ? 'bg-surface font-semibold text-ink shadow-xs'
+                      : 'font-medium text-muted hover:text-ink'
+                  "
                   @click="activeTab = 'blocks'"
                 >
                   Add Blocks
@@ -1422,6 +1522,7 @@ function chooseSwatch(row: Row, color: string) {
       </div>
     </div>
   </div>
+  </div>
 </template>
 
 <style scoped>
@@ -1432,5 +1533,45 @@ function chooseSwatch(row: Row, color: string) {
 .fade-enter-from,
 .fade-leave-to {
   opacity: 0;
+}
+
+.select-fade-enter-active,
+.select-fade-leave-active {
+  transition:
+    opacity 120ms ease,
+    transform 120ms ease;
+}
+.select-fade-enter-from,
+.select-fade-leave-to {
+  opacity: 0;
+  transform: scale(0.94);
+}
+
+/* Uniform press feedback across every button in this component — a single rule
+   here instead of touching each button's own Tailwind class list. Combines the
+   transition properties those buttons already relied on (color/background/
+   border/shadow via transition-colors or transition-shadow utilities) with the
+   new transform, since only one `transition` declaration can win per element. */
+button {
+  transition:
+    color 150ms ease,
+    background-color 150ms ease,
+    border-color 150ms ease,
+    box-shadow 150ms ease,
+    transform 100ms ease;
+}
+button:active {
+  transform: scale(0.97);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .select-fade-enter-active,
+  .select-fade-leave-active,
+  button {
+    transition: none;
+  }
+  button:active {
+    transform: none;
+  }
 }
 </style>
