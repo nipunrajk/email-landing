@@ -142,7 +142,7 @@ function countFor(category: string) {
 </script>
 
 <template>
-  <section class="border-t border-line py-20 sm:py-24 xl:py-28">
+  <section id="templates" class="scroll-mt-24 border-t border-line py-20 sm:py-24 xl:py-28">
     <div class="shell">
       <div class="mb-12 flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
         <div>

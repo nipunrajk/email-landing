@@ -3,11 +3,15 @@ import { onMounted, onUnmounted, ref, useTemplateRef } from 'vue'
 import { site } from '@/config'
 import Icon from '@/components/Icon.vue'
 
-const navLinks = [
-  { label: 'Product', href: '#product' },
-  { label: 'Exports', href: '#exports' },
-  { label: 'Who it’s for', href: '#audiences' },
-]
+const email = ref('')
+
+function handleTrialSubmit() {
+  const url = new URL(site.editorUrl, window.location.origin)
+  if (email.value.trim()) {
+    url.searchParams.set('email', email.value.trim())
+  }
+  window.location.href = url.toString()
+}
 
 const year = new Date().getFullYear()
 
@@ -427,8 +431,13 @@ onUnmounted(() => {
     <div class="shell">
       <div
         ref="cardRef"
-        class="relative overflow-hidden rounded-3xl bg-brand text-white shadow-2xl"
+        class="relative overflow-hidden rounded-3xl bg-gradient-to-b from-[#0b0f19] via-[#11132a] to-[#1c0f3d] text-white shadow-2xl"
       >
+        <div
+          class="pointer-events-none absolute -top-40 left-1/2 z-0 size-[560px] -translate-x-1/2 rounded-full bg-brand/20 blur-3xl"
+          aria-hidden="true"
+        />
+
         <canvas ref="canvasRef" class="pointer-events-none absolute inset-0 z-0 h-full w-full" aria-hidden="true" />
 
         <div class="pointer-events-none absolute inset-0 z-0" aria-hidden="true">
@@ -447,53 +456,63 @@ onUnmounted(() => {
           >
         </div>
 
-        <div
-          class="relative z-10 flex flex-col gap-10 px-6 pt-10 sm:flex-row sm:items-start sm:justify-between sm:px-12 sm:pt-14"
-        >
-          <div class="max-w-sm">
-            <div
-              class="flex items-center gap-2 font-mono text-[11px] font-bold tracking-[0.14em] text-white/70 uppercase"
-            >
-              <span class="size-1.5 rounded-full bg-white/70" aria-hidden="true" />
-              Straight from the canvas
-            </div>
-            <p class="mt-4 text-[17px] leading-snug font-medium text-white sm:text-[19px]">
-              Design in Figma. Export real markup. Check the inbox before you send.
-            </p>
-            <a
-              :href="site.editorUrl"
-              class="mt-6 inline-flex items-center gap-1.5 text-[14px] font-semibold text-white underline decoration-white/40 underline-offset-4 transition-colors hover:decoration-white"
-            >
-              Try the editor
-              <Icon name="arrow-right" class="size-4" />
-            </a>
+        <div class="relative z-10 mx-auto max-w-3xl px-6 pt-14 text-center sm:px-12 sm:pt-20">
+          <div
+            class="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/[0.06] px-4 py-1.5 text-[12px] font-medium text-white/80 backdrop-blur-md"
+          >
+            <span class="size-1.5 rounded-full bg-white/70" aria-hidden="true" />
+            <span>Instant Free Trial — No Credit Card Required</span>
           </div>
 
-          <div>
-            <div
-              class="flex items-center gap-2 font-mono text-[11px] font-bold tracking-[0.14em] text-white/70 uppercase"
-            >
-              <span class="size-1.5 rounded-full bg-white/70" aria-hidden="true" />
-              Explore
+          <h2
+            class="mt-6 font-display text-[36px] leading-[1.06] font-extrabold tracking-[-0.035em] text-white sm:text-[50px] lg:text-[58px]"
+          >
+            Ready to elevate your email marketing?
+          </h2>
+
+          <p class="mx-auto mt-4 max-w-xl text-[16px] leading-relaxed text-white/70 sm:text-[18px]">
+            Join 45,000+ top marketing teams building interactive, compliant, and beautifully rendered emails today.
+          </p>
+
+          <form
+            class="mt-9 flex flex-col items-center justify-center gap-3 sm:flex-row"
+            @submit.prevent="handleTrialSubmit"
+          >
+            <div class="relative w-full sm:w-[320px] md:w-[360px]">
+              <input
+                v-model="email"
+                type="email"
+                placeholder="Enter your work email..."
+                required
+                class="h-12 w-full rounded-xl border border-white/15 bg-[#0f172a]/70 px-4 text-[14px] text-white placeholder-white/40 shadow-inner backdrop-blur-sm transition-colors focus:border-brand-bright focus:bg-[#0f172a]/95 focus:outline-none focus:ring-2 focus:ring-brand-bright/30"
+              />
             </div>
-            <ul class="mt-4 flex flex-col gap-3">
-              <li v-for="item in navLinks" :key="item.href">
-                <a
-                  :href="item.href"
-                  class="group flex items-center gap-1.5 text-[14px] text-white/80 transition-colors hover:text-white"
-                >
-                  <span>{{ item.label }}</span>
-                  <Icon
-                    name="chevron-right"
-                    class="size-3.5 opacity-60 transition-transform group-hover:translate-x-0.5"
-                  />
-                </a>
-              </li>
-            </ul>
+            <button
+              type="submit"
+              class="inline-flex h-12 w-full items-center justify-center gap-2 rounded-xl bg-[#5e23e6] px-6 text-[14px] font-semibold text-white shadow-[0_4px_20px_rgba(94,35,230,0.5)] transition-all hover:bg-[#6c32ec] hover:shadow-[0_6px_24px_rgba(94,35,230,0.65)] active:scale-[0.98] sm:w-auto"
+            >
+              <span>Start Free Trial</span>
+              <Icon name="arrow-right" class="size-4" />
+            </button>
+          </form>
+
+          <div class="mt-6 flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-[12px] text-white/60">
+            <span class="inline-flex items-center gap-1.5">
+              <Icon name="check" class="size-3.5 text-emerald-400" />
+              <span>14-day free trial</span>
+            </span>
+            <span class="inline-flex items-center gap-1.5">
+              <Icon name="check" class="size-3.5 text-emerald-400" />
+              <span>Unlimited HTML exports</span>
+            </span>
+            <span class="inline-flex items-center gap-1.5">
+              <Icon name="check" class="size-3.5 text-emerald-400" />
+              <span>Direct ESP sync</span>
+            </span>
           </div>
         </div>
 
-        <div ref="spacerRef" class="mt-10 h-[220px] w-full sm:h-[300px] lg:h-[380px]" aria-hidden="true" />
+        <div ref="spacerRef" class="mt-8 h-[220px] w-full sm:h-[300px] lg:h-[380px]" aria-hidden="true" />
 
         <div
           class="relative z-10 flex items-center justify-between border-t border-white/15 px-6 py-5 text-[13px] text-white/60 sm:px-12"

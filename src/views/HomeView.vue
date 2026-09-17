@@ -7,7 +7,6 @@ import AudienceRow from '@/components/AudienceRow.vue'
 import TemplateGallery from '@/components/TemplateGallery.vue'
 import Testimonials from '@/components/Testimonials.vue'
 import StatsBand from '@/components/StatsBand.vue'
-import FooterCta from '@/components/FooterCta.vue'
 import SiteFooter from '@/components/SiteFooter.vue'
 </script>
 
@@ -22,7 +21,6 @@ import SiteFooter from '@/components/SiteFooter.vue'
       <TemplateGallery />
       <Testimonials />
       <StatsBand />
-      <FooterCta />
     </main>
     <SiteFooter />
   </div>
