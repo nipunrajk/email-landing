@@ -55,11 +55,11 @@ const toneClass: Record<string, string> = {
         </span>
         <div class="sm:pt-4">
           <h2
-            class="font-display text-[30px] leading-[1.12] font-bold tracking-[-0.025em] sm:text-[40px]"
+            class="font-display text-[30px] leading-[1.12] font-bold tracking-[-0.025em] text-balance sm:text-[40px]"
           >
             What teams say about Getdraft
           </h2>
-          <p class="mt-3 max-w-[520px] text-[16px] leading-relaxed text-muted sm:text-[17px]">
+          <p class="mt-3 max-w-[520px] text-[16px] leading-relaxed text-muted text-balance sm:text-[17px]">
             Placeholder copy — drop in three real quotes and this section is done.
           </p>
         </div>

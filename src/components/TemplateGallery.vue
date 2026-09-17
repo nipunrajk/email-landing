@@ -156,7 +156,7 @@ function countFor(category: string) {
               Template ecosystem
             </p>
             <h2
-              class="mt-1 max-w-[360px] font-display text-[22px] leading-[1.15] font-bold tracking-[-0.02em] sm:text-[26px]"
+              class="mt-1 max-w-[360px] font-display text-[22px] leading-[1.15] font-bold tracking-[-0.02em] text-balance sm:text-[26px]"
             >
               Tested layouts, ready to start from
             </h2>
@@ -191,7 +191,7 @@ function countFor(category: string) {
         <article
           v-for="tpl in visible"
           :key="tpl.name"
-          class="group flex flex-col overflow-hidden rounded-2xl border border-line bg-surface shadow-sm transition-all duration-200 hover:-translate-y-1 hover:shadow-xl"
+          class="group flex flex-col overflow-hidden rounded-2xl border border-line bg-surface shadow-sm transition-all duration-200 hover:-translate-y-1 hover:border-line-strong hover:shadow-xl"
         >
           <div class="relative h-52 overflow-hidden border-b border-line bg-canvas pt-5">
             <span
@@ -201,7 +201,7 @@ function countFor(category: string) {
             </span>
 
             <div
-              class="mx-auto h-full w-[74%] rounded-t-lg border border-line bg-surface p-3 shadow-sm transition-transform duration-300 group-hover:-translate-y-1"
+              class="mx-auto h-full w-[74%] rounded-t-lg border border-line bg-surface p-3 shadow-sm transition-all duration-300 group-hover:-translate-y-1 group-hover:scale-[1.03] group-hover:border-line-strong group-hover:shadow-md"
             >
               <template v-if="tpl.layout === 'hero'">
                 <div class="h-16 rounded bg-gradient-to-br from-[#2b3440] via-[#3d4a59] to-[#1d252e]" />
