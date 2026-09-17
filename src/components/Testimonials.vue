@@ -63,7 +63,7 @@ function initials(name: string) {
 </script>
 
 <template>
-  <section class="border-t border-line py-14 sm:py-16 xl:py-20">
+  <section class="border-t border-line pt-10 pb-14 sm:pt-12 sm:pb-16 xl:pt-14 xl:pb-20">
     <div class="shell">
       <div class="mb-12 max-w-[640px] sm:mb-14">
         <span

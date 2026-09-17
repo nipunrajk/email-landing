@@ -142,7 +142,7 @@ function monogram(name: string) {
 </script>
 
 <template>
-  <section id="templates" class="scroll-mt-24 border-t border-line py-20 sm:py-24 xl:py-28">
+  <section id="templates" class="scroll-mt-24 border-t border-line pt-14 pb-12 sm:pt-16 sm:pb-14 xl:pt-20 xl:pb-16">
     <div class="shell">
       <div class="mb-12 flex flex-col gap-8 md:flex-row md:items-end md:justify-between">
         <div class="max-w-[460px]">
@@ -368,7 +368,7 @@ function monogram(name: string) {
         </article>
       </TransitionGroup>
 
-      <div class="mt-14 flex flex-col items-center gap-3 text-center">
+      <div class="mt-10 flex flex-col items-center gap-3 text-center sm:mt-12">
         <a
           :href="site.editorUrl"
           class="inline-flex items-center gap-2 rounded-full border border-line-strong bg-surface px-6 py-3 font-mono text-[13px] font-semibold text-ink shadow-sm transition-all hover:border-brand/40 hover:shadow-md"
