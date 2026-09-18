@@ -50,6 +50,9 @@
                              the same wash used behind variable pills in the editor.
    --color-ink-deep #140f2b  The darkroom. Flat violet-black for the footer, pulled
                              toward the brand so its glow belongs to the same light.
+                             Also the ghost-cursor fill: brand-family without being
+                             --color-brand itself, which the same canvas already
+                             uses for the selection ring and insertion-line cue.
    --color-mint     #2d6a4a  "Passes" — a sap/pine proofing annotation, not a neon
                              UI success green. Stays clear of the brand hue so
                              status never competes with identity.

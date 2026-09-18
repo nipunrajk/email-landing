@@ -1,8 +1,9 @@
 <script setup lang="ts">
-import { computed, reactive, ref } from 'vue'
+import { computed, onUnmounted, reactive, ref, useTemplateRef } from 'vue'
 import { site } from '@/config'
 import Icon from '@/components/Icon.vue'
 import BrandMark from '@/components/BrandMark.vue'
+import CollaborativeCursors from '@/components/CollaborativeCursors.vue'
 
 type Selection = 'none' | 'image' | 'heading' | 'text' | 'button' | 'columns' | 'divider' | 'social'
 type TextKey = 'heading' | 'text'
@@ -155,6 +156,13 @@ const navFooter: NavItem[] = [
   { label: 'Settings', icon: 'settings' },
   { label: 'Support', icon: 'headphones' },
 ]
+
+const blockCursorKeys: Partial<Record<Exclude<Selection, 'none'>, string>> = {
+  image: 'block-image',
+  text: 'block-text',
+  button: 'block-button',
+  columns: 'block-columns',
+}
 
 const blockLibrary: { name: string; icon: string; target: Exclude<Selection, 'none'> }[] = [
   { name: 'Text', icon: 'code', target: 'text' },
@@ -340,8 +348,20 @@ const selectionTags: Record<Exclude<Selection, 'none'>, string> = {
   social: 'SOCIAL · ICONS',
 }
 
+// Blocks the ghost-cursor demo "drags in" — hidden until their build step
+// actually drops, so the canvas visibly goes from empty slot to filled block
+// instead of the drop landing on content that was already sitting there.
+// Defaults to fully built so the mockup still reads complete for visitors
+// who never see the demo run (reduced motion, narrow viewport, first paint
+// before the ghost decides whether it's active).
+type BuiltBlock = 'image' | 'text' | 'button' | 'columns'
+const builtBlocks = reactive<Set<BuiltBlock>>(new Set(['image', 'text', 'button', 'columns']))
+
 function select(target: Selection) {
   selected.value = target
+  if (target === 'image' || target === 'text' || target === 'button' || target === 'columns') {
+    builtBlocks.add(target)
+  }
   openMenu.value = null
 }
 
@@ -397,6 +417,44 @@ function chooseSwatch(row: Row, color: string) {
   row.value = color.replace('#', '').toUpperCase()
   openMenu.value = null
 }
+
+// --- Ghost cursor demo: autonomous collaboration choreography ---
+const workbenchRef = useTemplateRef<HTMLDivElement>('workbenchRef')
+
+const isUserInteracting = ref(false)
+let inactivityTimer: ReturnType<typeof setTimeout> | null = null
+
+function handleVisitorPointer() {
+  isUserInteracting.value = true
+  if (inactivityTimer) clearTimeout(inactivityTimer)
+  inactivityTimer = setTimeout(() => {
+    isUserInteracting.value = false
+  }, 4000)
+}
+
+function handleGhostTab(tab: 'properties' | 'blocks') {
+  activeTab.value = tab
+}
+
+function handleGhostView(view: 'desktop' | 'mobile') {
+  activeView.value = view
+}
+
+function handleGhostSelect(target: string) {
+  if (target === 'image' || target === 'text' || target === 'button' || target === 'columns') {
+    select(target)
+  }
+}
+
+function handleGhostReset() {
+  builtBlocks.clear()
+  activeTab.value = 'properties'
+  selected.value = 'none'
+}
+
+onUnmounted(() => {
+  if (inactivityTimer) clearTimeout(inactivityTimer)
+})
 </script>
 
 <template>
@@ -407,7 +465,10 @@ function chooseSwatch(row: Row, color: string) {
     />
 
     <div
-      class="mx-auto overflow-hidden rounded-2xl border border-line-strong bg-surface text-left shadow-[0_0_0_1px_rgba(255,255,255,0.8)_inset,0_32px_64px_-16px_rgba(15,29,40,0.22)] ring-1 ring-black/[0.04]"
+      ref="workbenchRef"
+      class="relative mx-auto overflow-hidden rounded-2xl border border-line-strong bg-surface text-left shadow-[0_0_0_1px_rgba(255,255,255,0.8)_inset,0_32px_64px_-16px_rgba(15,29,40,0.22)] ring-1 ring-black/[0.04]"
+      @pointerenter="handleVisitorPointer"
+      @pointermove="handleVisitorPointer"
     >
       <div v-if="openMenu" class="fixed inset-0 z-30" @click="openMenu = null" />
 
@@ -531,6 +592,7 @@ function chooseSwatch(row: Row, color: string) {
 
           <div class="flex shrink-0 items-center gap-2">
             <span
+              data-cursor-target="health-badge"
               class="hidden items-center gap-1.5 rounded-full bg-mint-soft px-2.5 py-1 text-[12px] font-semibold text-mint ring-1 ring-mint/20 sm:flex"
             >
               <Icon name="check-circle" class="size-3.5" />
@@ -769,10 +831,12 @@ function chooseSwatch(row: Row, color: string) {
                 <div class="transition-all duration-200" :style="{ padding: heroPadding }">
                   <button
                     type="button"
+                    data-cursor-target="canvas-image"
                     class="relative block w-full cursor-pointer"
                     @click="select('image')"
                   >
                     <span
+                      v-if="builtBlocks.has('image')"
                       class="relative block h-40 overflow-hidden bg-gradient-to-br from-[#2b3440] via-[#3d4a59] to-[#1d252e]"
                       :class="[ringClass('image'), isFullBleed ? '' : 'rounded-lg']"
                     >
@@ -785,6 +849,16 @@ function chooseSwatch(row: Row, color: string) {
                         <span class="block font-display text-[18px] font-bold text-white">
                           Autumn Equinox Drop
                         </span>
+                      </span>
+                    </span>
+                    <span
+                      v-else
+                      class="grid h-40 place-items-center gap-1.5 border-2 border-dashed border-line-strong bg-subtle/60 text-muted"
+                      :class="[ringClass('image'), isFullBleed ? '' : 'rounded-lg']"
+                    >
+                      <Icon name="image" class="size-5" />
+                      <span class="font-mono text-[10px] font-semibold tracking-wide uppercase">
+                        Image block
                       </span>
                     </span>
                     <Transition name="select-fade">
@@ -836,11 +910,13 @@ function chooseSwatch(row: Row, color: string) {
 
                 <button
                   type="button"
+                  data-cursor-target="canvas-text"
                   class="relative mx-5 mt-1 block w-[calc(100%-2.5rem)] cursor-pointer rounded px-1 py-1"
                   :class="ringClass('text')"
                   @click="select('text')"
                 >
                   <span
+                    v-if="builtBlocks.has('text')"
                     class="block leading-relaxed"
                     :class="textClass('text')"
                     :style="{ ...textStyle('text'), color: emailStyles.textColor }"
@@ -850,6 +926,10 @@ function chooseSwatch(row: Row, color: string) {
                     </span>
                     Crafted from sustainable deadstock merino. Built for weather that can’t make up
                     its mind.
+                  </span>
+                  <span v-else class="block space-y-1.5 py-1">
+                    <span class="block h-2 w-full rounded-full border border-dashed border-line-strong" />
+                    <span class="block h-2 w-4/5 rounded-full border border-dashed border-line-strong" />
                   </span>
                   <Transition name="select-fade">
                     <span v-if="selected === 'text'" class="pointer-events-none absolute inset-0">
@@ -871,12 +951,20 @@ function chooseSwatch(row: Row, color: string) {
                 <div class="flex justify-center px-5 py-4">
                   <button
                     type="button"
-                    class="relative cursor-pointer rounded-lg px-5 py-2.5 text-[12px] font-semibold text-white"
-                    :class="ringClass('button')"
-                    :style="{ background: emailStyles.brandColor }"
+                    data-cursor-target="canvas-button"
+                    class="relative cursor-pointer rounded-lg px-5 py-2.5 text-[12px] font-semibold"
+                    :class="[
+                      ringClass('button'),
+                      builtBlocks.has('button') ? 'text-white' : 'border-2 border-dashed border-line-strong text-muted',
+                    ]"
+                    :style="builtBlocks.has('button') ? { background: emailStyles.brandColor } : {}"
                     @click="select('button')"
                   >
-                    Shop the drop
+                    <span v-if="builtBlocks.has('button')">Shop the drop</span>
+                    <span v-else class="inline-flex items-center gap-1.5">
+                      <Icon name="bolt" class="size-3" />
+                      Button block
+                    </span>
                     <Transition name="select-fade">
                       <span v-if="selected === 'button'" class="pointer-events-none absolute inset-0">
                         <span
@@ -897,6 +985,7 @@ function chooseSwatch(row: Row, color: string) {
 
                 <button
                   type="button"
+                  data-cursor-target="canvas-dropzone"
                   class="relative grid w-full cursor-pointer rounded-lg transition-all"
                   :class="[
                     activeView === 'mobile'
@@ -906,46 +995,57 @@ function chooseSwatch(row: Row, color: string) {
                   ]"
                   @click="select('columns')"
                 >
+                  <template v-if="builtBlocks.has('columns')">
+                    <span
+                      class="block rounded-lg border border-line text-center transition-all"
+                      :class="activeView === 'mobile' ? 'p-2' : 'p-3'"
+                    >
+                      <span
+                        class="mb-2 block rounded bg-gradient-to-br from-subtle to-[#e7eaf2] transition-all"
+                        :class="activeView === 'mobile' ? 'h-14' : 'h-20'"
+                      />
+                      <span
+                        class="block font-bold leading-tight"
+                        :class="activeView === 'mobile' ? 'text-[11px]' : 'text-[12px]'"
+                      >
+                        Merino Overcoat
+                      </span>
+                      <span
+                        class="block text-muted"
+                        :class="activeView === 'mobile' ? 'text-[10px]' : 'text-[11px]'"
+                      >
+                        $320.00
+                      </span>
+                    </span>
+                    <span
+                      class="block rounded-lg border border-line text-center transition-all"
+                      :class="activeView === 'mobile' ? 'p-2' : 'p-3'"
+                    >
+                      <span
+                        class="mb-2 block rounded bg-gradient-to-br from-subtle to-[#e7eaf2] transition-all"
+                        :class="activeView === 'mobile' ? 'h-14' : 'h-20'"
+                      />
+                      <span
+                        class="block font-bold leading-tight"
+                        :class="activeView === 'mobile' ? 'text-[11px]' : 'text-[12px]'"
+                      >
+                        Ribbed Crewneck
+                      </span>
+                      <span
+                        class="block text-muted"
+                        :class="activeView === 'mobile' ? 'text-[10px]' : 'text-[11px]'"
+                      >
+                        $185.00
+                      </span>
+                    </span>
+                  </template>
                   <span
-                    class="block rounded-lg border border-line text-center transition-all"
-                    :class="activeView === 'mobile' ? 'p-2' : 'p-3'"
+                    v-else
+                    class="col-span-2 grid place-items-center gap-1.5 rounded-lg border-2 border-dashed border-line-strong bg-subtle/60 py-6 text-muted"
                   >
-                    <span
-                      class="mb-2 block rounded bg-gradient-to-br from-subtle to-[#e7eaf2] transition-all"
-                      :class="activeView === 'mobile' ? 'h-14' : 'h-20'"
-                    />
-                    <span
-                      class="block font-bold leading-tight"
-                      :class="activeView === 'mobile' ? 'text-[11px]' : 'text-[12px]'"
-                    >
-                      Merino Overcoat
-                    </span>
-                    <span
-                      class="block text-muted"
-                      :class="activeView === 'mobile' ? 'text-[10px]' : 'text-[11px]'"
-                    >
-                      $320.00
-                    </span>
-                  </span>
-                  <span
-                    class="block rounded-lg border border-line text-center transition-all"
-                    :class="activeView === 'mobile' ? 'p-2' : 'p-3'"
-                  >
-                    <span
-                      class="mb-2 block rounded bg-gradient-to-br from-subtle to-[#e7eaf2] transition-all"
-                      :class="activeView === 'mobile' ? 'h-14' : 'h-20'"
-                    />
-                    <span
-                      class="block font-bold leading-tight"
-                      :class="activeView === 'mobile' ? 'text-[11px]' : 'text-[12px]'"
-                    >
-                      Ribbed Crewneck
-                    </span>
-                    <span
-                      class="block text-muted"
-                      :class="activeView === 'mobile' ? 'text-[10px]' : 'text-[11px]'"
-                    >
-                      $185.00
+                    <Icon name="layers" class="size-5" />
+                    <span class="font-mono text-[10px] font-semibold tracking-wide uppercase">
+                      Columns block
                     </span>
                   </span>
                   <Transition name="select-fade">
@@ -1038,6 +1138,7 @@ function chooseSwatch(row: Row, color: string) {
                   <div class="flex rounded-full bg-subtle/80 p-0.5">
                     <button
                       type="button"
+                      data-cursor-target="desktop-toggle"
                       class="flex items-center gap-1.5 rounded-full px-3 py-1 text-[12px] font-semibold transition-all"
                       :class="activeView === 'desktop' ? 'bg-ink text-white shadow-xs' : 'text-muted hover:text-ink'"
                       @click="activeView = 'desktop'"
@@ -1047,6 +1148,7 @@ function chooseSwatch(row: Row, color: string) {
                     </button>
                     <button
                       type="button"
+                      data-cursor-target="mobile-toggle"
                       class="flex items-center gap-1.5 rounded-full px-3 py-1 text-[12px] font-semibold transition-all"
                       :class="activeView === 'mobile' ? 'bg-ink text-white shadow-xs' : 'text-muted hover:text-ink'"
                       @click="activeView = 'mobile'"
@@ -1091,6 +1193,7 @@ function chooseSwatch(row: Row, color: string) {
                 </button>
                 <button
                   type="button"
+                  data-cursor-target="blocks-tab"
                   class="flex h-8 flex-1 items-center justify-center rounded-lg text-[13px] transition-colors"
                   :class="
                     activeTab === 'blocks'
@@ -1111,6 +1214,7 @@ function chooseSwatch(row: Row, color: string) {
                     v-for="block in blockLibrary"
                     :key="block.name"
                     type="button"
+                    :data-cursor-target="blockCursorKeys[block.target]"
                     class="flex flex-col items-center gap-2 rounded-xl border p-3 text-center transition-colors"
                     :class="
                       selected === block.target
@@ -1553,6 +1657,15 @@ function chooseSwatch(row: Row, color: string) {
         </div>
       </div>
     </div>
+
+    <CollaborativeCursors
+      :container="workbenchRef"
+      :is-user-interacting="isUserInteracting"
+      @trigger-tab="handleGhostTab"
+      @trigger-select="handleGhostSelect"
+      @trigger-view="handleGhostView"
+      @trigger-reset="handleGhostReset"
+    />
   </div>
   </div>
 </template>
