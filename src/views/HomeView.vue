@@ -5,7 +5,6 @@ import CompatibilityBar from '@/components/CompatibilityBar.vue'
 import FeatureGrid from '@/components/FeatureGrid.vue'
 import AudienceRow from '@/components/AudienceRow.vue'
 import TemplateGallery from '@/components/TemplateGallery.vue'
-import Testimonials from '@/components/Testimonials.vue'
 import SiteFooter from '@/components/SiteFooter.vue'
 </script>
 
@@ -18,7 +17,6 @@ import SiteFooter from '@/components/SiteFooter.vue'
       <FeatureGrid />
       <AudienceRow />
       <TemplateGallery />
-      <Testimonials />
     </main>
     <SiteFooter />
   </div>

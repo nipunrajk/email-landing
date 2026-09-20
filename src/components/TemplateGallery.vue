@@ -147,12 +147,12 @@ function monogram(name: string) {
       <div class="mb-12 flex flex-col gap-8 md:flex-row md:items-end md:justify-between">
         <div class="max-w-[460px]">
           <span
-            class="inline-flex items-center gap-1.5 rounded-full bg-tint px-3 py-1 font-mono text-[11px] font-bold tracking-[0.08em] text-brand uppercase"
+            class="eyebrow"
           >
             Template ecosystem
           </span>
           <h2
-            class="mt-3 font-display text-[30px] leading-[1.12] font-bold tracking-[-0.025em] text-balance sm:text-[40px]"
+            class="mt-3 font-display text-[34px] leading-[1.08] font-medium tracking-[-0.015em] text-balance sm:text-[46px]"
           >
             Tested layouts, ready to ship
           </h2>
@@ -235,7 +235,7 @@ function monogram(name: string) {
                     style="background: radial-gradient(circle at 25% 20%, rgba(255, 255, 255, 0.45), transparent 55%), linear-gradient(135deg, var(--color-tint), #efeaff 45%, var(--color-surface) 100%)"
                   >
                     <p class="text-[6px] font-bold tracking-[0.1em] text-brand uppercase">New release</p>
-                    <p class="mt-1 font-display text-[10px] leading-tight font-black text-ink">
+                    <p class="mt-1 font-display text-[10px] leading-tight font-medium text-ink">
                       Ready to get<br />started?
                     </p>
                     <span
@@ -308,7 +308,7 @@ function monogram(name: string) {
                       style="background: radial-gradient(circle at 30% 20%, rgba(255, 255, 255, 0.28), transparent 55%), linear-gradient(140deg, #2b3440, #3d4a59 55%, #1d252e 100%)"
                     />
                     <div class="min-w-0 flex-1">
-                      <p class="font-display text-[7.5px] leading-tight font-bold text-ink">
+                      <p class="font-display text-[7.5px] leading-tight font-medium text-ink">
                         The quarter in review
                       </p>
                       <p class="mt-0.5 text-[6px] text-muted/70">By the Getdraft team</p>
@@ -349,7 +349,7 @@ function monogram(name: string) {
 
           <div class="flex flex-1 flex-col p-6">
             <div class="flex items-center justify-between gap-2">
-              <h3 class="font-display text-[17px] font-bold tracking-[-0.01em]">{{ tpl.name }}</h3>
+              <h3 class="font-display text-[20px] leading-tight font-medium tracking-[-0.015em]">{{ tpl.name }}</h3>
               <span class="shrink-0 rounded-full bg-subtle px-2 py-0.5 font-mono text-[10px] font-bold text-muted">
                 {{ tpl.category }}
               </span>
@@ -371,7 +371,7 @@ function monogram(name: string) {
       <div class="mt-10 flex flex-col items-center gap-3 text-center sm:mt-12">
         <a
           :href="site.editorUrl"
-          class="inline-flex items-center gap-2 rounded-full border border-line-strong bg-surface px-6 py-3 font-mono text-[13px] font-semibold text-ink shadow-sm transition-all hover:border-brand/40 hover:shadow-md"
+          class="inline-flex items-center gap-2 rounded-full border border-line-strong bg-surface px-6 py-3 text-[14px] font-semibold text-ink shadow-sm transition-all hover:border-brand/40 hover:shadow-md"
         >
           <span>Browse all {{ templates.length }} templates</span>
           <Icon name="arrow-right" class="size-4 text-brand" />

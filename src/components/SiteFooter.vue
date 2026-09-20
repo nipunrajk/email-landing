@@ -1,28 +1,35 @@
 <script setup lang="ts">
 import { onMounted, onUnmounted, ref, useTemplateRef } from 'vue'
 import { site } from '@/config'
+import { joinWaitlist } from '@/waitlist'
 import Icon from '@/components/Icon.vue'
 
 const email = ref('')
+const honeypot = ref('')
+const status = ref<'idle' | 'sending' | 'done' | 'error'>('idle')
 
-function handleTrialSubmit() {
-  const url = new URL(site.editorUrl, window.location.origin)
-  if (email.value.trim()) {
-    url.searchParams.set('email', email.value.trim())
+async function handleWaitlistSubmit() {
+  if (status.value === 'sending') return
+  status.value = 'sending'
+  try {
+    await joinWaitlist(email.value.trim(), honeypot.value)
+    status.value = 'done'
+  } catch (err) {
+    console.error('Waitlist sign-up failed', err)
+    status.value = 'error'
   }
-  window.location.href = url.toString()
 }
 
 const year = new Date().getFullYear()
 
 // Product capabilities, not trial/pricing terms — nothing here needs sourcing.
-const facts = ['Figma frame import', 'HTML · MJML · React Email · Blade', 'Verified for Outlook & Gmail']
+const facts = ['No account needed', 'Figma frame import', 'HTML · MJML · React Email · Blade', 'Verified for Outlook & Gmail']
 
 const cardRef = useTemplateRef<HTMLDivElement>('cardRef')
 const spacerRef = useTemplateRef<HTMLDivElement>('spacerRef')
 const canvasRef = useTemplateRef<HTMLCanvasElement>('canvasRef')
 
-const FONT_FAMILY = '"Plus Jakarta Sans"'
+const FONT_FAMILY = '"Hanken Grotesk"'
 const WORDMARK = 'Getdraft'
 
 interface Dot {
@@ -430,7 +437,7 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <footer id="pricing" class="scroll-mt-12 py-12 sm:py-16">
+  <footer class="py-12 sm:py-16">
     <div class="shell">
       <div
         ref="cardRef"
@@ -464,11 +471,11 @@ onUnmounted(() => {
             class="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/[0.06] px-4 py-1.5 text-[12px] font-medium text-white/80 backdrop-blur-md"
           >
             <span class="size-1.5 rounded-full bg-white/70" aria-hidden="true" />
-            <span>Open the editor — no install, no setup</span>
+            <span>Runs in your browser — no install, no account</span>
           </div>
 
           <h2
-            class="mt-6 font-display text-[36px] leading-[1.06] font-extrabold tracking-[-0.035em] text-white sm:text-[50px] lg:text-[58px]"
+            class="mt-6 font-display text-[40px] leading-[1.04] font-medium tracking-[-0.015em] text-balance text-white sm:text-[56px] lg:text-[66px]"
           >
             Take a Figma frame all the way to the inbox.
           </h2>
@@ -478,27 +485,67 @@ onUnmounted(() => {
             — then check it before you send.
           </p>
 
-          <form
-            class="mt-9 flex flex-col items-center justify-center gap-3 sm:flex-row"
-            @submit.prevent="handleTrialSubmit"
-          >
-            <div class="relative w-full sm:w-[320px] md:w-[360px]">
+          <div class="mt-8">
+            <a :href="site.editorUrl" class="btn btn-primary btn-lg !rounded-xl shadow-[0_4px_20px_rgba(110,68,255,0.45)]">
+              <Icon name="bolt" class="size-4" />
+              <span>Try the editor</span>
+            </a>
+          </div>
+
+          <div class="mx-auto mt-10 max-w-xl border-t border-white/10 pt-8">
+            <p class="text-[14px] leading-relaxed text-white/70">
+              Some features are limited until the full release. Leave your email and we’ll tell you
+              when it opens.
+            </p>
+
+            <p
+              v-if="status === 'done'"
+              class="mt-5 inline-flex items-center gap-2 rounded-xl border border-white/15 bg-white/[0.06] px-4 py-3 text-[14px] font-medium text-white"
+              role="status"
+            >
+              <Icon name="check-circle" class="size-4 text-brand-bright" />
+              You’re on the list. We’ll email you when the full version opens.
+            </p>
+
+            <form
+              v-else
+              class="mt-5 flex flex-col items-center justify-center gap-3 sm:flex-row"
+              @submit.prevent="handleWaitlistSubmit"
+            >
+              <label class="sr-only" for="waitlist-email">Email address</label>
               <input
+                id="waitlist-email"
                 v-model="email"
                 type="email"
-                placeholder="Enter your work email..."
+                name="email"
+                autocomplete="email"
+                placeholder="you@company.com"
                 required
-                class="h-12 w-full rounded-xl border border-white/15 bg-white/5 px-4 text-[14px] text-white placeholder-white/40 shadow-inner backdrop-blur-sm transition-colors focus:border-brand-bright focus:bg-white/10 focus:outline-none focus:ring-2 focus:ring-brand-bright/30"
+                :disabled="status === 'sending'"
+                class="h-12 w-full rounded-xl border border-white/15 bg-white/5 px-4 text-[14px] text-white placeholder-white/40 shadow-inner backdrop-blur-sm transition-colors focus:border-brand-bright focus:bg-white/10 focus:outline-none focus:ring-2 focus:ring-brand-bright/30 disabled:opacity-60 sm:w-[300px]"
               />
-            </div>
-            <button
-              type="submit"
-              class="inline-flex h-12 w-full items-center justify-center gap-2 rounded-xl bg-brand px-6 text-[14px] font-semibold text-white shadow-[0_4px_20px_rgba(110,68,255,0.45)] transition-all hover:bg-brand-deep hover:shadow-[0_6px_24px_rgba(110,68,255,0.6)] active:scale-[0.98] sm:w-auto"
-            >
-              <span>Start Building Free</span>
-              <Icon name="arrow-right" class="size-4" />
-            </button>
-          </form>
+              <!-- Honeypot: hidden from people and screen readers, bots fill it. -->
+              <input
+                v-model="honeypot"
+                type="text"
+                name="website"
+                tabindex="-1"
+                autocomplete="off"
+                aria-hidden="true"
+                class="absolute -left-[9999px] size-0 opacity-0"
+              />
+              <button
+                type="submit"
+                :disabled="status === 'sending'"
+                class="inline-flex h-12 w-full items-center justify-center gap-2 rounded-xl border border-white/25 px-6 text-[14px] font-semibold text-white transition-all hover:bg-white/10 active:scale-[0.98] disabled:opacity-60 sm:w-auto"
+              >
+                <span>{{ status === 'sending' ? 'Sending…' : 'Notify me' }}</span>
+              </button>
+            </form>
+            <p v-if="status === 'error'" class="mt-3 text-[13px] text-coral-soft" role="alert">
+              Couldn’t save that. Please try again in a moment.
+            </p>
+          </div>
 
           <div class="mt-6 flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-[12px] text-white/60">
             <span v-for="fact in facts" :key="fact" class="inline-flex items-center gap-1.5">
@@ -514,7 +561,6 @@ onUnmounted(() => {
           class="relative z-10 flex items-center justify-between border-t border-white/15 px-6 py-5 text-[13px] text-white/60 sm:px-12"
         >
           <span>© {{ year }} {{ site.name }}</span>
-          <a :href="site.loginUrl" class="transition-colors hover:text-white">Log in</a>
         </div>
       </div>
     </div>

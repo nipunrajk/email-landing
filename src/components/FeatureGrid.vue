@@ -94,12 +94,12 @@ onUnmounted(() => {
     <div class="shell">
       <div class="mx-auto mb-14 max-w-[740px] text-center sm:mb-20">
         <span
-          class="rounded-full bg-tint px-3.5 py-1 text-[11px] font-bold tracking-[0.08em] text-brand uppercase"
+          class="eyebrow"
         >
           How it works
         </span>
         <h2
-          class="mx-auto mt-4 max-w-[680px] font-display text-[30px] leading-[1.12] font-bold tracking-[-0.025em] text-balance sm:text-[40px] xl:text-[44px]"
+          class="mx-auto mt-4 max-w-[860px] font-display text-[34px] leading-[1.08] font-medium tracking-[-0.015em] text-balance sm:text-[46px] xl:text-[52px]"
         >
           Engineered for flawless inboxes and production-ready markup
         </h2>
@@ -120,7 +120,7 @@ onUnmounted(() => {
             <span class="mb-5 grid size-12 place-items-center rounded-xl bg-tint text-brand">
               <Icon name="frame" class="size-6" />
             </span>
-            <h3 class="mb-3 font-display text-[22px] font-bold tracking-[-0.015em] text-balance sm:text-[26px]">
+            <h3 class="mb-3 font-display text-[25px] leading-[1.15] font-medium tracking-[-0.015em] text-balance sm:text-[29px]">
               Frames become blocks, not screenshots
             </h3>
             <p class="text-[15px] leading-relaxed text-muted">
@@ -178,7 +178,7 @@ onUnmounted(() => {
             <span class="mb-5 grid size-12 place-items-center rounded-xl bg-tint text-brand">
               <Icon name="code" class="size-6" />
             </span>
-            <h3 class="mb-3 font-display text-[22px] font-bold tracking-[-0.015em] text-balance sm:text-[26px]">
+            <h3 class="mb-3 font-display text-[25px] leading-[1.15] font-medium tracking-[-0.015em] text-balance sm:text-[29px]">
               One canvas, four exports
             </h3>
             <p class="mb-6 text-[15px] leading-relaxed text-muted">
@@ -212,7 +212,7 @@ onUnmounted(() => {
             <span class="mb-5 grid size-12 place-items-center rounded-xl bg-mint-soft text-mint">
               <Icon name="check-circle" class="size-6" />
             </span>
-            <h3 class="mb-3 font-display text-[22px] font-bold tracking-[-0.015em] text-balance sm:text-[26px]">
+            <h3 class="mb-3 font-display text-[25px] leading-[1.15] font-medium tracking-[-0.015em] text-balance sm:text-[29px]">
               Catch it before the send
             </h3>
             <p class="mb-6 text-[15px] leading-relaxed text-muted">
@@ -282,7 +282,7 @@ onUnmounted(() => {
             <span class="mb-5 grid size-12 place-items-center rounded-xl bg-tint text-brand">
               <Icon name="layers" class="size-6" />
             </span>
-            <h3 class="mb-3 font-display text-[22px] font-bold tracking-[-0.015em] text-balance sm:text-[26px]">
+            <h3 class="mb-3 font-display text-[25px] leading-[1.15] font-medium tracking-[-0.015em] text-balance sm:text-[29px]">
               Markup you’d be happy to own
             </h3>
             <p class="text-[15px] leading-relaxed text-muted">

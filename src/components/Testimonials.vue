@@ -13,44 +13,11 @@ interface Testimonial {
   avatarGradient: string
 }
 
-const testimonials: Testimonial[] = [
-  {
-    metricLabel: '14 hrs saved / release',
-    metricIcon: 'trending-up',
-    toneClass: 'bg-tint text-brand',
-    quote:
-      'We stopped slicing frames into static PNGs months ago. Designers drop full Auto Layout frames straight into Getdraft, and the exported markup actually respects our token spacing, typography hierarchy, and responsive breakpoints.',
-    author: 'Elena Rostova',
-    title: 'Design Systems Lead',
-    company: 'Rayform',
-    companyBadge: 'Series B FinTech',
-    avatarGradient: 'from-violet-500 to-indigo-600',
-  },
-  {
-    metricLabel: '0 Outlook regressions',
-    metricIcon: 'check-circle',
-    toneClass: 'bg-mint-soft text-mint',
-    quote:
-      'Before Getdraft, every major product broadcast came with pre-send dread around Outlook 120 DPI spacing bugs and Gmail 102KB clipping. Running the automated pre-send audits gives our entire marketing team complete peace of mind.',
-    author: 'Marcus Vance',
-    title: 'Head of Lifecycle Marketing',
-    company: 'Orbit Labs',
-    companyBadge: 'High-Growth SaaS',
-    avatarGradient: 'from-emerald-500 to-teal-700',
-  },
-  {
-    metricLabel: '100% clean React Email JSX',
-    metricIcon: 'code',
-    toneClass: 'bg-tint text-brand',
-    quote:
-      'Email templates used to be the ticket nobody on the frontend team wanted to touch. Getdraft gives us production-grade React Email and MJML components that we can actually review in pull requests, git-diff, and commit.',
-    author: 'Devon Chen',
-    title: 'Staff Frontend Engineer',
-    company: 'Layer0',
-    companyBadge: 'Developer Platform',
-    avatarGradient: 'from-blue-500 to-cyan-600',
-  },
-]
+// Real, approved quotes only. Every entry needs written permission from the person
+// quoted, and any metric must come from them or from measured usage data. While this
+// is empty the section renders nothing. To bring it back: add a quote here, then
+// re-add the import and <Testimonials /> in views/HomeView.vue.
+const testimonials: Testimonial[] = []
 
 function initials(name: string) {
   return name
@@ -63,23 +30,15 @@ function initials(name: string) {
 </script>
 
 <template>
-  <section class="border-t border-line pt-10 pb-14 sm:pt-12 sm:pb-16 xl:pt-14 xl:pb-20">
+  <section v-if="testimonials.length" class="border-t border-line pt-10 pb-14 sm:pt-12 sm:pb-16 xl:pt-14 xl:pb-20">
     <div class="shell">
       <div class="mb-12 max-w-[640px] sm:mb-14">
-        <span
-          class="inline-flex items-center gap-1.5 rounded-full bg-tint px-3 py-1 font-mono text-[11px] font-bold tracking-[0.08em] text-brand uppercase"
-        >
-          Social proof
-        </span>
+        <span class="eyebrow">Customers</span>
         <h2
-          class="mt-3 font-display text-[30px] leading-[1.12] font-bold tracking-[-0.025em] text-balance sm:text-[40px]"
+          class="mt-3 font-display text-[34px] leading-[1.08] font-medium tracking-[-0.015em] text-balance sm:text-[46px]"
         >
-          Trusted by teams shipping high-stakes email
+          What teams are saying
         </h2>
-        <p class="mt-3 text-[15px] leading-relaxed text-muted text-balance sm:text-[16px]">
-          From design systems leads to lifecycle marketers and frontend engineers — see how modern teams
-          eliminated the broken-table email cycle.
-        </p>
       </div>
 
       <div class="grid gap-6 sm:grid-cols-3 sm:gap-8">
@@ -115,7 +74,7 @@ function initials(name: string) {
               {{ initials(item.author) }}
             </span>
             <span class="min-w-0">
-              <span class="block truncate font-display text-[15px] font-bold text-ink">
+              <span class="block truncate text-[15px] font-semibold text-ink">
                 {{ item.author }}
               </span>
               <span class="block truncate text-[13px] text-muted">

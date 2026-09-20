@@ -24,7 +24,7 @@ withDefaults(
       }"
     />
     <span
-      class="font-display font-black tracking-[-0.04em] uppercase select-none"
+      class="font-sans font-extrabold tracking-[-0.03em] uppercase select-none"
       :class="[
         theme === 'dark' ? 'text-white' : 'text-ink',
         {

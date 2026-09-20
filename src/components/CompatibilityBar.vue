@@ -261,7 +261,7 @@ onUnmounted(() => {
                 {{ activeItem.verb }}
               </p>
               <div class="flex flex-wrap items-baseline gap-x-3 gap-y-0.5">
-                <h3 class="font-display text-[24px] font-bold tracking-[-0.02em] text-ink sm:text-[28px]">
+                <h3 class="font-display text-[26px] leading-[1.1] font-medium tracking-[-0.015em] text-ink sm:text-[30px]">
                   {{ activeItem.name }}
                 </h3>
                 <span class="text-[14px] font-medium text-muted">

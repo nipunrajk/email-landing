@@ -17,7 +17,7 @@ function toggleMenu(key: string) {
   openMenu.value = openMenu.value === key ? null : key
 }
 
-const FONT_OPTIONS = ['Plus Jakarta', 'Inter', 'Georgia', 'Courier New']
+const FONT_OPTIONS = ['Newsreader', 'Hanken Grotesk', 'Inter', 'Georgia']
 const SIZE_OPTIONS = ['12', '14', '15', '18', '22', '28']
 // Mirrors the design-token palette so the mockup swatches match the real editor.
 const SWATCHES = [
@@ -31,10 +31,10 @@ const SWATCHES = [
   '#ffffff',
 ]
 const FONT_STACK: Record<string, string> = {
-  'Plus Jakarta': 'var(--font-display)',
-  Inter: 'var(--font-sans)',
+  Newsreader: 'var(--font-display)',
+  'Hanken Grotesk': 'var(--font-sans)',
+  Inter: 'var(--font-ui)',
   Georgia: 'Georgia, serif',
-  'Courier New': '"Courier New", monospace',
 }
 
 interface TextFormat {
@@ -51,7 +51,7 @@ interface TextFormat {
 
 const formats = reactive<Record<TextKey, TextFormat>>({
   heading: {
-    font: 'Plus Jakarta',
+    font: 'Newsreader',
     size: 15,
     bold: true,
     italic: false,
@@ -62,7 +62,7 @@ const formats = reactive<Record<TextKey, TextFormat>>({
     align: 'center',
   },
   text: {
-    font: 'Plus Jakarta',
+    font: 'Hanken Grotesk',
     size: 12,
     bold: false,
     italic: false,
@@ -466,7 +466,7 @@ onUnmounted(() => {
 
     <div
       ref="workbenchRef"
-      class="relative mx-auto overflow-hidden rounded-2xl border border-line-strong bg-surface text-left shadow-[0_0_0_1px_rgba(255,255,255,0.8)_inset,0_32px_64px_-16px_rgba(15,29,40,0.22)] ring-1 ring-black/[0.04]"
+      class="relative mx-auto overflow-hidden rounded-2xl border border-line-strong bg-surface text-left font-ui shadow-[0_0_0_1px_rgba(255,255,255,0.8)_inset,0_32px_64px_-16px_rgba(15,29,40,0.22)] ring-1 ring-black/[0.04]"
       @pointerenter="handleVisitorPointer"
       @pointermove="handleVisitorPointer"
     >
@@ -482,7 +482,7 @@ onUnmounted(() => {
       <aside class="hidden w-64 shrink-0 flex-col border-r border-line bg-surface lg:flex">
         <div class="flex h-[72px] shrink-0 items-center gap-2.5 px-3.5">
           <BrandMark class="size-7" />
-          <span class="font-display text-[15px] font-black tracking-[-0.03em] uppercase text-ink">{{ site.name }}</span>
+          <span class="font-ui text-[15px] font-extrabold tracking-[-0.03em] uppercase text-ink">{{ site.name }}</span>
           <span
             class="ml-auto grid size-6 place-items-center rounded-md border border-line bg-surface text-muted shadow-xs"
           >
@@ -623,7 +623,7 @@ onUnmounted(() => {
           <div class="flex min-w-0 flex-1 flex-col">
             <div class="shrink-0 border-b border-line bg-surface px-4 pt-4 pb-3 sm:px-6">
               <div class="flex items-center gap-2">
-                <h3 class="font-display text-[20px] font-bold tracking-[-0.02em]">
+                <h3 class="text-[20px] font-semibold tracking-[-0.02em]">
                   Autumn Equinox Drop
                 </h3>
                 <Icon name="pencil" class="size-3.5 text-muted" />
@@ -846,7 +846,7 @@ onUnmounted(() => {
                         >
                           Limited capsule
                         </span>
-                        <span class="block font-display text-[18px] font-bold text-white">
+                        <span class="block font-display text-[18px] font-medium text-white">
                           Autumn Equinox Drop
                         </span>
                       </span>

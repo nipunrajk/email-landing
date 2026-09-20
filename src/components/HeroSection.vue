@@ -3,7 +3,7 @@ import Ctas from '@/components/Ctas.vue'
 import Icon from '@/components/Icon.vue'
 import EditorWorkbench from '@/components/EditorWorkbench.vue'
 
-const facts = ['Figma frame import', 'HTML · MJML · React Email · Blade', 'Verified for Outlook & Gmail']
+const facts = ['No account needed', 'Figma frame import', 'HTML · MJML · React Email · Blade', 'Verified for Outlook & Gmail']
 </script>
 
 <template>
@@ -24,7 +24,7 @@ const facts = ['Figma frame import', 'HTML · MJML · React Email · Blade', 'Ve
           class="inline-flex items-center gap-2 rounded-full border border-line-strong bg-surface px-3.5 py-1.5 shadow-sm transition-colors hover:border-brand"
         >
           <span
-            class="rounded-full bg-mint-soft px-2 py-0.5 font-mono text-[11px] font-semibold text-mint"
+            class="rounded-full bg-mint-soft px-2 py-0.5 font-mono text-[11px] font-semibold whitespace-nowrap text-mint"
           >
             Figma → email
           </span>
@@ -33,13 +33,13 @@ const facts = ['Figma frame import', 'HTML · MJML · React Email · Blade', 'Ve
         </a>
 
         <h1
-          class="mx-auto mt-8 max-w-[900px] font-display text-[38px] leading-[1.05] font-extrabold tracking-[-0.03em] sm:text-[56px] xl:text-[64px]"
+          class="mx-auto mt-8 max-w-[900px] font-display text-[42px] leading-[1.02] font-medium tracking-[-0.02em] text-balance sm:text-[64px] xl:text-[76px]"
         >
-          <span class="text-muted">Design in Figma.</span>
-          <span class="text-ink">Ship real email markup.</span>
+          <span class="block text-muted">Design in Figma.</span>
+          <span class="block text-ink">Ship real email markup.</span>
         </h1>
 
-        <p class="mx-auto mt-6 max-w-[620px] text-[17px] leading-relaxed text-muted sm:text-[19px]">
+        <p class="mx-auto mt-6 max-w-[620px] text-[17px] leading-relaxed text-balance text-muted sm:text-[19px]">
           Getdraft turns your frames into editable email blocks, exports clean HTML, MJML, React Email
           or Blade, and checks the inbox before you send.
         </p>

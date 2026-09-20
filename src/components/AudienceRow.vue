@@ -61,12 +61,12 @@ const audiences: Persona[] = [
         <div class="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
           <div>
             <span
-              class="inline-flex items-center gap-1.5 rounded-full bg-tint px-3 py-1 font-mono text-[11px] font-bold tracking-[0.08em] text-brand uppercase"
+              class="eyebrow"
             >
               Who it’s for
             </span>
             <h2
-              class="mt-3 font-display text-[28px] leading-[1.15] font-bold tracking-[-0.025em] text-balance sm:text-[36px] xl:text-[40px]"
+              class="mt-3 font-display text-[32px] leading-[1.1] font-medium tracking-[-0.015em] text-balance sm:text-[42px] xl:text-[48px]"
             >
               One canvas, three sets of expectations
             </h2>
@@ -90,7 +90,7 @@ const audiences: Persona[] = [
             >
               <Icon :name="item.icon" class="size-5" />
             </span>
-            <h3 class="font-display text-[21px] font-bold tracking-[-0.02em] text-ink">
+            <h3 class="font-display text-[24px] leading-[1.15] font-medium tracking-[-0.015em] text-ink">
               {{ item.role }}
             </h3>
             <p class="mt-1 text-[14.5px] font-semibold text-ink/80 leading-snug">

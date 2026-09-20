@@ -8,7 +8,6 @@ const nav = [
   { label: 'Templates', href: '#templates' },
   { label: 'Integrations', href: '#exports' },
   { label: 'Showcase', href: '#audiences' },
-  { label: 'Pricing', href: '#pricing' },
 ]
 </script>
 
@@ -19,7 +18,7 @@ const nav = [
     >
       <a href="#top" class="group flex items-center gap-2.5 text-ink transition-opacity duration-150 hover:opacity-85">
         <BrandMark class="size-8 sm:size-9 shadow-xs" />
-        <span class="font-display text-[20px] font-black tracking-[-0.04em] uppercase text-ink sm:text-[22px]">
+        <span class="font-sans text-[20px] font-extrabold tracking-[-0.03em] uppercase text-ink sm:text-[22px]">
           {{ site.name }}
         </span>
       </a>
@@ -42,16 +41,11 @@ const nav = [
 
       <div class="flex items-center gap-4 sm:gap-6">
         <a
-          :href="site.loginUrl"
-          class="text-[14px] font-medium text-muted transition-colors hover:text-ink"
-        >
-          Log In
-        </a>
-        <a
           :href="site.editorUrl"
-          class="inline-flex h-10 items-center justify-center gap-2 rounded-xl bg-brand px-5 text-[14px] font-semibold text-white shadow-sm transition-all hover:bg-brand-deep active:scale-[0.98]"
+          class="inline-flex h-10 items-center justify-center gap-2 rounded-xl bg-brand px-4 text-[14px] font-semibold whitespace-nowrap text-white sm:px-5 shadow-sm transition-all hover:bg-brand-deep active:scale-[0.98]"
         >
-          <span>Start Building Free</span>
+          <span class="sm:hidden">Try it</span>
+          <span class="hidden sm:inline">Try the editor</span>
           <Icon name="arrow-right" class="size-3.5" />
         </a>
       </div>

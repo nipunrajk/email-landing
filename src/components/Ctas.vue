@@ -18,7 +18,7 @@ withDefaults(
   >
     <a :href="site.editorUrl" class="btn btn-primary !rounded-xl" :class="`btn-${size}`">
       <Icon name="bolt" class="size-4" />
-      <span>Start Building Free</span>
+      <span>Try the editor</span>
     </a>
     <a href="#demo" class="btn btn-ghost !rounded-xl" :class="`btn-${size}`">
       <Icon name="play-circle" class="size-4 text-brand" />
