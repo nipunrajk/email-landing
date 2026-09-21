@@ -415,6 +415,9 @@ function setPadding(padding: string) {
 function chooseSwatch(row: Row, color: string) {
   row.swatch = color
   row.value = color.replace('#', '').toUpperCase()
+  if (selected.value === 'button' || row.label.toLowerCase().includes('fill')) {
+    emailStyles.brandColor = color
+  }
   openMenu.value = null
 }
 
@@ -424,12 +427,35 @@ const workbenchRef = useTemplateRef<HTMLDivElement>('workbenchRef')
 const isUserInteracting = ref(false)
 let inactivityTimer: ReturnType<typeof setTimeout> | null = null
 
-function handleVisitorPointer() {
+// Only manual click pauses the ghost cursor, hovering or mouse movement will not stop it
+function handleVisitorManualClick() {
   isUserInteracting.value = true
   if (inactivityTimer) clearTimeout(inactivityTimer)
   inactivityTimer = setTimeout(() => {
     isUserInteracting.value = false
   }, 4000)
+}
+
+const isDarkMode = ref(false)
+function toggleDarkMode(force?: boolean) {
+  isDarkMode.value = typeof force === 'boolean' ? force : !isDarkMode.value
+  if (isDarkMode.value) {
+    emailStyles.canvasBg = '#14171d'
+    emailStyles.emailBg = '#1c2027'
+    emailStyles.textColor = '#F9FAFB'
+  } else {
+    emailStyles.canvasBg = '#EDF1F4'
+    emailStyles.emailBg = '#FFFFFF'
+    emailStyles.textColor = '#5A6B78'
+  }
+}
+
+const previewSentPulse = ref(false)
+function handleSendPreviewClick() {
+  previewSentPulse.value = true
+  setTimeout(() => {
+    previewSentPulse.value = false
+  }, 2200)
 }
 
 function handleGhostTab(tab: 'properties' | 'blocks') {
@@ -441,15 +467,63 @@ function handleGhostView(view: 'desktop' | 'mobile') {
 }
 
 function handleGhostSelect(target: string) {
-  if (target === 'image' || target === 'text' || target === 'button' || target === 'columns') {
-    select(target)
+  if (target === 'none') {
+    selected.value = 'none'
+  } else if (target === 'heading' || target === 'image' || target === 'text' || target === 'button' || target === 'columns') {
+    select(target as Selection)
+  }
+}
+
+function handleGhostFont(font: string) {
+  patchFormat({ font })
+  openMenu.value = null
+}
+
+function handleGhostMenu(menu: string | null) {
+  openMenu.value = menu
+}
+
+function handleGhostColor(color: string) {
+  emailStyles.brandColor = color
+  const btnSec = blockSections.button[0]
+  if (btnSec && btnSec.rows[1]) {
+    btnSec.rows[1].swatch = color
+    btnSec.rows[1].value = color.replace('#', '').toUpperCase()
+  }
+  openMenu.value = null
+}
+
+function handleGhostSendPreview() {
+  handleSendPreviewClick()
+}
+
+function handleGhostStartStory(story: 1 | 2) {
+  if (story === 1) {
+    builtBlocks.clear()
+    activeTab.value = 'properties'
+    selected.value = 'none'
+    activeView.value = 'desktop'
+    openMenu.value = null
+    formats.heading.font = 'Newsreader'
+    emailStyles.brandColor = '#6E44FF'
+    emailStyles.canvasBg = '#EDF1F4'
+    emailStyles.emailBg = '#FFFFFF'
+    emailStyles.textColor = '#5A6B78'
+    isDarkMode.value = false
+  } else {
+    builtBlocks.add('image')
+    builtBlocks.add('text')
+    builtBlocks.add('button')
+    builtBlocks.add('columns')
+    selected.value = 'none'
+    activeTab.value = 'properties'
+    activeView.value = 'desktop'
+    openMenu.value = null
   }
 }
 
 function handleGhostReset() {
-  builtBlocks.clear()
-  activeTab.value = 'properties'
-  selected.value = 'none'
+  handleGhostStartStory(1)
 }
 
 onUnmounted(() => {
@@ -467,8 +541,7 @@ onUnmounted(() => {
     <div
       ref="workbenchRef"
       class="relative mx-auto overflow-hidden rounded-2xl border border-line-strong bg-surface text-left font-ui shadow-[0_0_0_1px_rgba(255,255,255,0.8)_inset,0_32px_64px_-16px_rgba(15,29,40,0.22)] ring-1 ring-black/[0.04]"
-      @pointerenter="handleVisitorPointer"
-      @pointermove="handleVisitorPointer"
+      @pointerdown="handleVisitorManualClick"
     >
       <div v-if="openMenu" class="fixed inset-0 z-30" @click="openMenu = null" />
 
@@ -603,13 +676,16 @@ onUnmounted(() => {
             >
               <Icon name="settings" class="size-4" />
             </span>
-            <span class="hidden h-5 w-px bg-line sm:block" />
-            <span
-              class="hidden items-center gap-1.5 rounded-lg border border-line px-3 py-1.5 text-[13px] font-semibold shadow-xs md:flex"
+            <button
+              type="button"
+              data-cursor-target="send-preview"
+              class="hidden items-center gap-1.5 rounded-lg border px-3 py-1.5 text-[13px] font-semibold shadow-xs md:flex transition-all duration-200 cursor-pointer"
+              :class="previewSentPulse ? 'border-mint bg-mint-soft text-mint scale-105' : 'border-line bg-surface hover:bg-subtle text-ink'"
+              @click="handleSendPreviewClick"
             >
-              <Icon name="send" class="size-3.5" />
-              Send Preview
-            </span>
+              <Icon :name="previewSentPulse ? 'check-circle' : 'send'" class="size-3.5" />
+              <span>{{ previewSentPulse ? 'Sent to Inbox!' : 'Send Preview' }}</span>
+            </button>
             <span
               class="flex items-center gap-1.5 rounded-lg border border-line px-3 py-1.5 text-[13px] font-semibold shadow-xs"
             >
@@ -651,7 +727,8 @@ onUnmounted(() => {
               <div class="relative shrink-0">
                 <button
                   type="button"
-                  class="flex h-8 w-[120px] items-center justify-between rounded-lg bg-subtle px-2.5 text-xs font-medium transition-colors hover:bg-line/60 xl:w-[136px]"
+                  data-cursor-target="toolbar-font-btn"
+                  class="flex h-8 w-[120px] items-center justify-between rounded-lg bg-subtle px-2.5 text-xs font-medium transition-colors hover:bg-line/60 xl:w-[136px] cursor-pointer"
                   @click="toggleMenu('font')"
                 >
                   <span class="truncate">{{ fmt.font }}</span>
@@ -665,7 +742,8 @@ onUnmounted(() => {
                     v-for="font in FONT_OPTIONS"
                     :key="font"
                     type="button"
-                    class="flex w-full items-center rounded px-2 py-1.5 text-left text-[12px] whitespace-nowrap transition-colors hover:bg-subtle"
+                    :data-cursor-target="font === 'Inter' ? 'font-option-inter' : undefined"
+                    class="flex w-full items-center rounded px-2 py-1.5 text-left text-[12px] whitespace-nowrap transition-colors hover:bg-subtle cursor-pointer"
                     :class="font === fmt.font ? 'font-semibold text-brand' : ''"
                     @click="pickFont(font)"
                   >
@@ -881,6 +959,7 @@ onUnmounted(() => {
 
                 <button
                   type="button"
+                  data-cursor-target="canvas-heading"
                   class="relative mx-5 block w-[calc(100%-2.5rem)] cursor-pointer rounded px-1 py-1"
                   :class="ringClass('heading')"
                   @click="select('heading')"
@@ -1158,9 +1237,16 @@ onUnmounted(() => {
                     </button>
                   </div>
                   <span class="mx-0.5 h-4 w-px bg-line" />
-                  <span class="grid size-7 place-items-center rounded-full text-muted transition-colors hover:bg-subtle/80 hover:text-ink">
+                  <button
+                    type="button"
+                    data-cursor-target="dark-toggle"
+                    class="grid size-7 place-items-center rounded-full transition-all cursor-pointer"
+                    :class="isDarkMode ? 'bg-ink text-mint shadow-xs' : 'text-muted hover:bg-subtle/80 hover:text-ink'"
+                    title="Toggle dark mode preview"
+                    @click="toggleDarkMode()"
+                  >
                     <Icon name="moon" class="size-3.5" />
-                  </span>
+                  </button>
                   <span class="grid size-7 place-items-center rounded-full text-muted transition-colors hover:bg-subtle/80 hover:text-ink">
                     <Icon name="ruler" class="size-3.5" />
                   </span>
@@ -1181,7 +1267,8 @@ onUnmounted(() => {
               <div class="flex h-10 items-center rounded-xl border border-line bg-subtle p-1">
                 <button
                   type="button"
-                  class="flex h-8 flex-1 items-center justify-center rounded-lg text-[13px] transition-colors"
+                  data-cursor-target="properties-tab"
+                  class="flex h-8 flex-1 items-center justify-center rounded-lg text-[13px] transition-colors cursor-pointer"
                   :class="
                     activeTab === 'properties'
                       ? 'bg-surface font-semibold text-ink shadow-xs'
@@ -1410,6 +1497,7 @@ onUnmounted(() => {
                         <div class="relative min-w-0 flex-1">
                           <button
                             type="button"
+                            data-cursor-target="brand-color-btn"
                             class="flex h-8 w-full items-center gap-1.5 rounded-lg bg-subtle px-2.5 text-[13px] transition-colors hover:bg-line/60"
                             @click="toggleMenu('brandColor')"
                           >
@@ -1426,9 +1514,10 @@ onUnmounted(() => {
                             class="absolute top-full right-0 z-40 mt-1 grid grid-cols-4 gap-1 rounded-lg border border-line bg-surface p-2 shadow-lg"
                           >
                             <button
-                              v-for="color in SWATCHES"
+                              v-for="(color, idx) in SWATCHES"
                               :key="color"
                               type="button"
+                              :data-cursor-target="idx === 3 ? 'swatch-pick' : undefined"
                               class="size-5 rounded border border-line-strong"
                               :style="{ background: color }"
                               @click="setColor('brandColor', color)"
@@ -1576,7 +1665,8 @@ onUnmounted(() => {
                         <div v-else-if="row.swatch" class="relative min-w-0 flex-1">
                           <button
                             type="button"
-                            class="flex h-8 w-full items-center gap-1.5 rounded-lg bg-subtle px-2.5 text-[13px] transition-colors hover:bg-line/60"
+                            data-cursor-target="block-swatch-btn"
+                            class="flex h-8 w-full items-center gap-1.5 rounded-lg bg-subtle px-2.5 text-[13px] transition-colors hover:bg-line/60 cursor-pointer"
                             @click="toggleMenu(`${section.title}-${row.label}`)"
                           >
                             <span
@@ -1590,10 +1680,11 @@ onUnmounted(() => {
                             class="absolute top-full right-0 z-40 mt-1 grid grid-cols-4 gap-1 rounded-lg border border-line bg-surface p-2 shadow-lg"
                           >
                             <button
-                              v-for="color in SWATCHES"
+                              v-for="(color, idx) in SWATCHES"
                               :key="color"
                               type="button"
-                              class="size-5 rounded border border-line-strong"
+                              :data-cursor-target="idx === 3 ? 'swatch-pick-block' : undefined"
+                              class="size-5 rounded border border-line-strong cursor-pointer"
                               :style="{ background: color }"
                               @click="chooseSwatch(row, color)"
                             />
@@ -1664,6 +1755,11 @@ onUnmounted(() => {
       @trigger-tab="handleGhostTab"
       @trigger-select="handleGhostSelect"
       @trigger-view="handleGhostView"
+      @trigger-menu="handleGhostMenu"
+      @trigger-font="handleGhostFont"
+      @trigger-color="handleGhostColor"
+      @trigger-send-preview="handleGhostSendPreview"
+      @trigger-start-story="handleGhostStartStory"
       @trigger-reset="handleGhostReset"
     />
   </div>

@@ -11,7 +11,11 @@ const emit = defineEmits<{
   'trigger-tab': [tab: 'properties' | 'blocks']
   'trigger-select': [target: string]
   'trigger-view': [view: 'desktop' | 'mobile']
-  'trigger-drop': []
+  'trigger-menu': [menu: string | null]
+  'trigger-font': [font: string]
+  'trigger-color': [color: string]
+  'trigger-send-preview': []
+  'trigger-start-story': [story: 1 | 2]
   'trigger-reset': []
 }>()
 
@@ -20,13 +24,9 @@ interface Point {
   y: number
 }
 
-// A single ghost cursor demos the product end to end — it builds the
-// template (Image, then Text, then Button, then Columns, each dragged from
-// the block library onto its own canvas element) and then runs the pre-send
-// QA pass (mobile check, health badge, back to desktop). All positions are
-// derived at runtime from data-cursor-target rects (or fractions of the
-// container box for spawn/rest points), so nothing here is a hardcoded
-// screen coordinate.
+// ==========================================
+// STORY 1: Block Assembly & Responsive QA
+// ==========================================
 interface BuildStep {
   libraryKey: string
   canvasKey: string
@@ -42,59 +42,95 @@ const buildSteps: BuildStep[] = [
   { libraryKey: 'block-columns', canvasKey: 'canvas-dropzone', selection: 'columns', label: 'Columns', icon: 'layers' },
 ]
 
-const TAB_GLIDE_END = 900
-const TAB_DWELL_END = 1300
-const STEP_GLIDE = 700
-const STEP_DWELL = 300
-const STEP_DRAG = 700
-const STEP_DROP = 200
-const STEP_DURATION = STEP_GLIDE + STEP_DWELL + STEP_DRAG + STEP_DROP
+const S1_FADE_IN = 500
+const S1_TO_TAB = 1100
+const S1_CLICK_TAB = 1400
 
-const BUILD_START = TAB_DWELL_END
-const BUILD_END = BUILD_START + buildSteps.length * STEP_DURATION
+const S1_STEP_GLIDE = 600
+const S1_STEP_DWELL = 250
+const S1_STEP_DRAG = 550
+const S1_STEP_DROP = 200
+const S1_STEP_DURATION = S1_STEP_GLIDE + S1_STEP_DWELL + S1_STEP_DRAG + S1_STEP_DROP // 1600ms
 
-const TIMING = {
-  toTab: TAB_GLIDE_END,
-  clickTab: TAB_DWELL_END,
-  buildEnd: BUILD_END,
-  toMobile: BUILD_END + 1200,
-  clickMobile: BUILD_END + 1200 + 1300,
-  toHealth: BUILD_END + 1200 + 1300 + 1300,
-  toDesktop: BUILD_END + 1200 + 1300 + 1300 + 1200,
-} as const
+const S1_BUILD_START = S1_CLICK_TAB
+const S1_BUILD_END = S1_BUILD_START + buildSteps.length * S1_STEP_DURATION // 1400 + 6400 = 7800ms
 
-const cycleDuration = TIMING.toDesktop + 2500
+const S1_TO_MOBILE = S1_BUILD_END + 900 // 8700ms
+const S1_CLICK_MOBILE = S1_TO_MOBILE + 400 // 9100ms
+const S1_TO_HEALTH = S1_CLICK_MOBILE + 1000 // 10100ms
+const S1_TO_DESKTOP = S1_TO_HEALTH + 1000 // 11100ms
+const S1_CLICK_DESKTOP = S1_TO_DESKTOP + 400 // 11500ms
+const S1_DWELL = S1_CLICK_DESKTOP + 800 // 12300ms
+const S1_FADE_OUT = S1_DWELL + 600 // 12900ms
+const S1_TOTAL = S1_FADE_OUT + 500 // 13400ms
 
-function stepStart(index: number): number {
-  return BUILD_START + index * STEP_DURATION
-}
+// ==========================================
+// STORY 2: Live Canvas Selection & Design Tuning
+// ==========================================
+const S2_FADE_IN = 500
+const S2_TO_HEADING = 1000
+const S2_CLICK_HEADING = 1300
+const S2_TO_FONT_BTN = S2_CLICK_HEADING + 1000 // 2300ms
+const S2_CLICK_FONT_BTN = S2_TO_FONT_BTN + 400 // 2700ms
+const S2_TO_FONT_OPT = S2_CLICK_FONT_BTN + 700 // 3400ms
+const S2_CLICK_FONT_OPT = S2_TO_FONT_OPT + 400 // 3800ms
+const S2_TO_BUTTON = S2_CLICK_FONT_OPT + 1100 // 4900ms
+const S2_CLICK_BUTTON = S2_TO_BUTTON + 400 // 5300ms
+const S2_TO_SWATCH_BTN = S2_CLICK_BUTTON + 1000 // 6300ms
+const S2_CLICK_SWATCH_BTN = S2_TO_SWATCH_BTN + 400 // 6700ms
+const S2_TO_SWATCH_PICK = S2_CLICK_SWATCH_BTN + 700 // 7400ms
+const S2_CLICK_SWATCH_PICK = S2_TO_SWATCH_PICK + 400 // 7800ms
+const S2_TO_SEND = S2_CLICK_SWATCH_PICK + 1200 // 9000ms
+const S2_CLICK_SEND = S2_TO_SEND + 400 // 9400ms
+const S2_DWELL = S2_CLICK_SEND + 1400 // 10800ms
+const S2_FADE_OUT = S2_DWELL + 600 // 11400ms
+const S2_TOTAL = S2_FADE_OUT + 500 // 11900ms
 
+const currentStory = ref<1 | 2>(1)
 const motionEnabled = ref(true)
-// The choreography's targets (blocks tab, block library, health badge) only
-// exist in the DOM at lg: and above in this layout — below that, running the
-// demo would just collapse the cursor to (0,0) for whatever's hidden.
 const viewportSupported = ref(true)
 const active = computed(() => motionEnabled.value && viewportSupported.value)
+
 const cursorPos = ref<Point>({ x: 0, y: 0 })
+const cursorFadeOpacity = ref(1)
 const healthBadgePos = ref<Point>({ x: 0, y: 0 })
 const showGhostBlock = ref(false)
 const healthPulseActive = ref(false)
 const ghostLabel = ref(buildSteps[0]!.label)
 const ghostIcon = ref(buildSteps[0]!.icon)
 
-const fired = {
+const firedS1 = {
   clickTab: false,
   steps: new Set<number>(),
   clickMobile: false,
   clickDesktop: false,
 }
 
-function resetFired() {
-  fired.clickTab = false
-  fired.steps.clear()
-  fired.clickMobile = false
-  fired.clickDesktop = false
-  emit('trigger-reset')
+const firedS2 = {
+  clickHeading: false,
+  clickFontBtn: false,
+  clickFontOpt: false,
+  clickButton: false,
+  clickSwatchBtn: false,
+  clickSwatchPick: false,
+  clickSend: false,
+}
+
+function resetS1() {
+  firedS1.clickTab = false
+  firedS1.steps.clear()
+  firedS1.clickMobile = false
+  firedS1.clickDesktop = false
+}
+
+function resetS2() {
+  firedS2.clickHeading = false
+  firedS2.clickFontBtn = false
+  firedS2.clickFontOpt = false
+  firedS2.clickButton = false
+  firedS2.clickSwatchBtn = false
+  firedS2.clickSwatchPick = false
+  firedS2.clickSend = false
 }
 
 function ease(t: number): number {
@@ -103,6 +139,7 @@ function ease(t: number): number {
 }
 
 function progress(elapsed: number, start: number, end: number): number {
+  if (end <= start) return 1
   return ease((elapsed - start) / (end - start))
 }
 
@@ -110,24 +147,26 @@ function lerp(a: Point, b: Point, t: number): Point {
   return { x: a.x + (b.x - a.x) * t, y: a.y + (b.y - a.y) * t }
 }
 
-function targetPoint(key: string): Point {
-  const container = props.container
-  if (!container) return { x: 0, y: 0 }
-  const el = container.querySelector<HTMLElement>(`[data-cursor-target="${key}"]`)
-  if (!el) return { x: 0, y: 0 }
-  const containerRect = container.getBoundingClientRect()
-  const rect = el.getBoundingClientRect()
-  return {
-    x: rect.left - containerRect.left + rect.width / 2,
-    y: rect.top - containerRect.top + rect.height / 2,
-  }
-}
-
 function relativePoint(xFraction: number, yFraction: number): Point {
   const container = props.container
   if (!container) return { x: 0, y: 0 }
   const rect = container.getBoundingClientRect()
   return { x: rect.width * xFraction, y: rect.height * yFraction }
+}
+
+function targetPoint(key: string, fallback?: Point): Point {
+  const container = props.container
+  const defaultFallback = fallback ?? relativePoint(0.5, 0.5)
+  if (!container) return defaultFallback
+  const el = container.querySelector<HTMLElement>(`[data-cursor-target="${key}"]`)
+  if (!el) return defaultFallback
+  const containerRect = container.getBoundingClientRect()
+  const rect = el.getBoundingClientRect()
+  if (rect.width === 0 && rect.height === 0) return defaultFallback
+  return {
+    x: rect.left - containerRect.left + rect.width / 2,
+    y: rect.top - containerRect.top + rect.height / 2,
+  }
 }
 
 let rafId: number | null = null
@@ -139,104 +178,208 @@ function tick(timestamp: number) {
   const delta = timestamp - lastFrameTime
   lastFrameTime = timestamp
 
-  // Pause the choreography's clock (not just its visibility) while a real
-  // visitor is present, so a ghost action can never fire and silently
-  // override something the visitor just clicked themselves.
   if (!props.isUserInteracting) {
     elapsedAccum += delta
   }
-  if (elapsedAccum >= cycleDuration) {
-    elapsedAccum = 0
-    resetFired()
-  }
-  const elapsed = elapsedAccum
 
-  healthBadgePos.value = targetPoint('health-badge')
-  healthPulseActive.value = elapsed >= TIMING.toHealth && elapsed < TIMING.toHealth + 900
-
-  if (elapsed <= TIMING.toTab) {
-    // --- glide in and open the block library ---
-    showGhostBlock.value = false
-    cursorPos.value = lerp(
-      relativePoint(0.5, 0.55),
-      targetPoint('blocks-tab'),
-      progress(elapsed, 0, TIMING.toTab),
-    )
-  } else if (elapsed <= TIMING.clickTab) {
-    showGhostBlock.value = false
-    cursorPos.value = targetPoint('blocks-tab')
-    if (!fired.clickTab) {
-      fired.clickTab = true
-      emit('trigger-tab', 'blocks')
+  // ==========================================
+  // RUN STORY 1: Build & Mobile QA
+  // ==========================================
+  if (currentStory.value === 1) {
+    if (elapsedAccum >= S1_TOTAL) {
+      elapsedAccum = 0
+      resetS2()
+      currentStory.value = 2
+      emit('trigger-start-story', 2)
+      rafId = requestAnimationFrame(tick)
+      return
     }
-  } else if (elapsed <= TIMING.buildEnd) {
-    // --- build the template one block at a time ---
-    const sinceBuildStart = elapsed - BUILD_START
-    const rawIndex = Math.min(buildSteps.length - 1, Math.floor(sinceBuildStart / STEP_DURATION))
-    const step = buildSteps[rawIndex]!
-    const start = stepStart(rawIndex)
-    const glideEnd = start + STEP_GLIDE
-    const dwellEnd = glideEnd + STEP_DWELL
-    const dragEnd = dwellEnd + STEP_DRAG
 
-    ghostLabel.value = step.label
-    ghostIcon.value = step.icon
+    const elapsed = elapsedAccum
+    healthBadgePos.value = targetPoint('health-badge')
+    healthPulseActive.value = elapsed >= S1_TO_HEALTH && elapsed < S1_TO_HEALTH + 800
 
-    if (elapsed <= glideEnd) {
-      const prevTarget = rawIndex === 0 ? targetPoint('blocks-tab') : targetPoint(buildSteps[rawIndex - 1]!.libraryKey)
+    // Fade in / out opacity curve
+    if (elapsed < S1_FADE_IN) {
+      cursorFadeOpacity.value = elapsed / S1_FADE_IN
+    } else if (elapsed >= S1_DWELL && elapsed < S1_FADE_OUT) {
+      cursorFadeOpacity.value = Math.max(0, 1 - (elapsed - S1_DWELL) / (S1_FADE_OUT - S1_DWELL))
+    } else if (elapsed >= S1_FADE_OUT) {
+      cursorFadeOpacity.value = 0
+    } else {
+      cursorFadeOpacity.value = 1
+    }
+
+    const spawnPoint = relativePoint(0.5, 0.55)
+    const blocksTabPoint = targetPoint('blocks-tab', spawnPoint)
+
+    if (elapsed <= S1_TO_TAB) {
       showGhostBlock.value = false
-      cursorPos.value = lerp(prevTarget, targetPoint(step.libraryKey), progress(elapsed, start, glideEnd))
-    } else if (elapsed <= dwellEnd) {
-      showGhostBlock.value = true
-      cursorPos.value = targetPoint(step.libraryKey)
-    } else if (elapsed <= dragEnd) {
-      showGhostBlock.value = true
-      cursorPos.value = lerp(
-        targetPoint(step.libraryKey),
-        targetPoint(step.canvasKey),
-        progress(elapsed, dwellEnd, dragEnd),
-      )
+      cursorPos.value = lerp(spawnPoint, blocksTabPoint, progress(elapsed, 0, S1_TO_TAB))
+    } else if (elapsed <= S1_CLICK_TAB) {
+      showGhostBlock.value = false
+      cursorPos.value = blocksTabPoint
+      if (!firedS1.clickTab) {
+        firedS1.clickTab = true
+        emit('trigger-tab', 'blocks')
+      }
+    } else if (elapsed <= S1_BUILD_END) {
+      const sinceBuildStart = elapsed - S1_BUILD_START
+      const rawIndex = Math.min(buildSteps.length - 1, Math.floor(sinceBuildStart / S1_STEP_DURATION))
+      const step = buildSteps[rawIndex]!
+      const stepStart = S1_BUILD_START + rawIndex * S1_STEP_DURATION
+      const glideEnd = stepStart + S1_STEP_GLIDE
+      const dwellEnd = glideEnd + S1_STEP_DWELL
+      const dragEnd = dwellEnd + S1_STEP_DRAG
+
+      ghostLabel.value = step.label
+      ghostIcon.value = step.icon
+
+      const prevTarget = rawIndex === 0 ? blocksTabPoint : targetPoint(buildSteps[rawIndex - 1]!.libraryKey, blocksTabPoint)
+      const libTarget = targetPoint(step.libraryKey, prevTarget)
+      const canvasTarget = targetPoint(step.canvasKey, libTarget)
+
+      if (elapsed <= glideEnd) {
+        showGhostBlock.value = false
+        cursorPos.value = lerp(prevTarget, libTarget, progress(elapsed, stepStart, glideEnd))
+      } else if (elapsed <= dwellEnd) {
+        showGhostBlock.value = true
+        cursorPos.value = libTarget
+      } else if (elapsed <= dragEnd) {
+        showGhostBlock.value = true
+        cursorPos.value = lerp(libTarget, canvasTarget, progress(elapsed, dwellEnd, dragEnd))
+      } else {
+        showGhostBlock.value = true
+        cursorPos.value = canvasTarget
+        if (!firedS1.steps.has(rawIndex)) {
+          firedS1.steps.add(rawIndex)
+          emit('trigger-select', step.selection)
+        }
+      }
     } else {
-      showGhostBlock.value = true
-      cursorPos.value = targetPoint(step.canvasKey)
-      if (!fired.steps.has(rawIndex)) {
-        fired.steps.add(rawIndex)
-        emit('trigger-select', step.selection)
-        emit('trigger-drop')
+      showGhostBlock.value = false
+      const lastCanvasPos = targetPoint(buildSteps[buildSteps.length - 1]!.canvasKey, relativePoint(0.5, 0.5))
+      const mobilePos = targetPoint('mobile-toggle', lastCanvasPos)
+      const healthPos = targetPoint('health-badge', mobilePos)
+      const desktopPos = targetPoint('desktop-toggle', healthPos)
+
+      if (elapsed <= S1_TO_MOBILE) {
+        cursorPos.value = lerp(lastCanvasPos, mobilePos, progress(elapsed, S1_BUILD_END, S1_TO_MOBILE))
+      } else if (elapsed <= S1_CLICK_MOBILE) {
+        cursorPos.value = mobilePos
+        if (!firedS1.clickMobile) {
+          firedS1.clickMobile = true
+          emit('trigger-view', 'mobile')
+        }
+      } else if (elapsed <= S1_TO_HEALTH) {
+        cursorPos.value = lerp(mobilePos, healthPos, progress(elapsed, S1_CLICK_MOBILE, S1_TO_HEALTH))
+      } else if (elapsed <= S1_TO_DESKTOP) {
+        cursorPos.value = lerp(healthPos, desktopPos, progress(elapsed, S1_TO_HEALTH, S1_TO_DESKTOP))
+      } else {
+        cursorPos.value = desktopPos
+        if (!firedS1.clickDesktop) {
+          firedS1.clickDesktop = true
+          emit('trigger-view', 'desktop')
+        }
       }
     }
-  } else {
-    // --- pre-send QA pass: mobile check, health badge, back to desktop ---
+  }
+  // ==========================================
+  // RUN STORY 2: Canvas Block Selection & Design Tuning
+  // ==========================================
+  else {
+    if (elapsedAccum >= S2_TOTAL) {
+      elapsedAccum = 0
+      resetS1()
+      currentStory.value = 1
+      emit('trigger-start-story', 1)
+      rafId = requestAnimationFrame(tick)
+      return
+    }
+
+    const elapsed = elapsedAccum
     showGhostBlock.value = false
-    if (elapsed <= TIMING.toMobile) {
-      cursorPos.value = lerp(
-        targetPoint(buildSteps[buildSteps.length - 1]!.canvasKey),
-        targetPoint('mobile-toggle'),
-        progress(elapsed, TIMING.buildEnd, TIMING.toMobile),
-      )
-    } else if (elapsed <= TIMING.clickMobile) {
-      cursorPos.value = targetPoint('mobile-toggle')
-      if (!fired.clickMobile) {
-        fired.clickMobile = true
-        emit('trigger-view', 'mobile')
-      }
-    } else if (elapsed <= TIMING.toHealth) {
-      cursorPos.value = lerp(
-        targetPoint('mobile-toggle'),
-        targetPoint('health-badge'),
-        progress(elapsed, TIMING.clickMobile, TIMING.toHealth),
-      )
-    } else if (elapsed <= TIMING.toDesktop) {
-      cursorPos.value = lerp(
-        targetPoint('health-badge'),
-        targetPoint('desktop-toggle'),
-        progress(elapsed, TIMING.toHealth, TIMING.toDesktop),
-      )
+
+    // Fade in / out opacity curve
+    if (elapsed < S2_FADE_IN) {
+      cursorFadeOpacity.value = elapsed / S2_FADE_IN
+    } else if (elapsed >= S2_DWELL && elapsed < S2_FADE_OUT) {
+      cursorFadeOpacity.value = Math.max(0, 1 - (elapsed - S2_DWELL) / (S2_FADE_OUT - S2_DWELL))
+    } else if (elapsed >= S2_FADE_OUT) {
+      cursorFadeOpacity.value = 0
     } else {
-      cursorPos.value = targetPoint('desktop-toggle')
-      if (!fired.clickDesktop) {
-        fired.clickDesktop = true
-        emit('trigger-view', 'desktop')
+      cursorFadeOpacity.value = 1
+    }
+
+    const startPos = targetPoint('desktop-toggle', relativePoint(0.5, 0.7))
+    const headingPos = targetPoint('canvas-heading', relativePoint(0.5, 0.45))
+    const fontBtnPos = targetPoint('toolbar-font-btn', relativePoint(0.4, 0.15))
+    const fontOptPos = targetPoint('font-option-inter', fontBtnPos)
+    const buttonPos = targetPoint('canvas-button', relativePoint(0.5, 0.6))
+    const swatchBtnPos = targetPoint('block-swatch-btn', relativePoint(0.85, 0.45))
+    const swatchPickPos = targetPoint('swatch-pick-block', swatchBtnPos)
+    const sendPos = targetPoint('send-preview', relativePoint(0.8, 0.1))
+
+    if (elapsed <= S2_TO_HEADING) {
+      cursorPos.value = lerp(startPos, headingPos, progress(elapsed, 0, S2_TO_HEADING))
+    } else if (elapsed <= S2_CLICK_HEADING) {
+      cursorPos.value = headingPos
+      if (!firedS2.clickHeading) {
+        firedS2.clickHeading = true
+        emit('trigger-select', 'heading')
+      }
+    } else if (elapsed <= S2_TO_FONT_BTN) {
+      cursorPos.value = lerp(headingPos, fontBtnPos, progress(elapsed, S2_CLICK_HEADING, S2_TO_FONT_BTN))
+    } else if (elapsed <= S2_CLICK_FONT_BTN) {
+      cursorPos.value = fontBtnPos
+      if (!firedS2.clickFontBtn) {
+        firedS2.clickFontBtn = true
+        emit('trigger-menu', 'font')
+      }
+    } else if (elapsed <= S2_TO_FONT_OPT) {
+      cursorPos.value = lerp(fontBtnPos, fontOptPos, progress(elapsed, S2_CLICK_FONT_BTN, S2_TO_FONT_OPT))
+    } else if (elapsed <= S2_CLICK_FONT_OPT) {
+      cursorPos.value = fontOptPos
+      if (!firedS2.clickFontOpt) {
+        firedS2.clickFontOpt = true
+        emit('trigger-font', 'Inter')
+      }
+    } else if (elapsed <= S2_TO_BUTTON) {
+      cursorPos.value = lerp(fontOptPos, buttonPos, progress(elapsed, S2_CLICK_FONT_OPT, S2_TO_BUTTON))
+    } else if (elapsed <= S2_CLICK_BUTTON) {
+      cursorPos.value = buttonPos
+      if (!firedS2.clickButton) {
+        firedS2.clickButton = true
+        emit('trigger-select', 'button')
+      }
+    } else if (elapsed <= S2_TO_SWATCH_BTN) {
+      cursorPos.value = lerp(buttonPos, swatchBtnPos, progress(elapsed, S2_CLICK_BUTTON, S2_TO_SWATCH_BTN))
+    } else if (elapsed <= S2_CLICK_SWATCH_BTN) {
+      cursorPos.value = swatchBtnPos
+      if (!firedS2.clickSwatchBtn) {
+        firedS2.clickSwatchBtn = true
+        emit('trigger-menu', 'Button-Fill')
+      }
+    } else if (elapsed <= S2_TO_SWATCH_PICK) {
+      cursorPos.value = lerp(swatchBtnPos, swatchPickPos, progress(elapsed, S2_CLICK_SWATCH_BTN, S2_TO_SWATCH_PICK))
+    } else if (elapsed <= S2_CLICK_SWATCH_PICK) {
+      cursorPos.value = swatchPickPos
+      if (!firedS2.clickSwatchPick) {
+        firedS2.clickSwatchPick = true
+        emit('trigger-color', '#a78bfa')
+      }
+    } else if (elapsed <= S2_TO_SEND) {
+      cursorPos.value = lerp(swatchPickPos, sendPos, progress(elapsed, S2_CLICK_SWATCH_PICK, S2_TO_SEND))
+    } else if (elapsed <= S2_CLICK_SEND) {
+      cursorPos.value = sendPos
+      if (!firedS2.clickSend) {
+        firedS2.clickSend = true
+        emit('trigger-send-preview')
+      }
+    } else {
+      cursorPos.value = sendPos
+      if (elapsed >= S2_DWELL) {
+        emit('trigger-select', 'none')
       }
     }
   }
@@ -251,7 +394,9 @@ function syncActive() {
   if (active.value && rafId === null) {
     lastFrameTime = null
     elapsedAccum = 0
-    resetFired()
+    currentStory.value = 1
+    resetS1()
+    emit('trigger-start-story', 1)
     rafId = requestAnimationFrame(tick)
   } else if (!active.value && rafId !== null) {
     cancelAnimationFrame(rafId)
@@ -291,29 +436,36 @@ onUnmounted(() => {
 <template>
   <div
     v-if="active"
-    class="pointer-events-none absolute inset-0 z-40 transition-opacity duration-500"
-    :style="{ opacity: isUserInteracting ? 0 : 1 }"
+    class="pointer-events-none absolute inset-0 z-40 transition-opacity duration-300"
+    :style="{ opacity: isUserInteracting ? 0 : cursorFadeOpacity }"
     aria-hidden="true"
   >
+    <!-- Health score ring ping -->
     <div
       v-if="healthPulseActive"
       class="absolute size-8 -translate-x-1/2 -translate-y-1/2 animate-ping rounded-full bg-mint/30"
       :style="{ left: `${healthBadgePos.x}px`, top: `${healthBadgePos.y}px` }"
     />
 
+    <!-- Ghost Cursor -->
     <div
-      class="absolute -translate-x-1 -translate-y-1"
+      class="absolute -translate-x-1 -translate-y-1 transition-transform duration-75 ease-out"
       :style="{ left: `${cursorPos.x}px`, top: `${cursorPos.y}px` }"
     >
-      <svg width="34" height="34" viewBox="0 0 24 24" class="fill-ink-deep stroke-line-strong drop-shadow-[0_3px_8px_rgba(15,29,40,0.4)]">
+      <svg
+        width="34"
+        height="34"
+        viewBox="0 0 24 24"
+        class="fill-ink-deep stroke-line-strong drop-shadow-[0_4px_12px_rgba(15,29,40,0.45)]"
+      >
         <path d="M4 3 20 11 12.5 13 10 21 4 3Z" stroke-width="1.25" stroke-linejoin="round" />
       </svg>
       <div
         v-if="showGhostBlock"
-        class="mt-1 ml-4 flex items-center gap-1 rounded-md border border-brand/40 bg-surface/95 px-2 py-1 shadow-md"
+        class="mt-1 ml-4 flex items-center gap-1.5 rounded-md border border-brand/40 bg-surface/95 px-2.5 py-1 shadow-md backdrop-blur-sm"
       >
         <Icon :name="ghostIcon" class="size-3 text-brand" />
-        <span class="font-mono text-[8px] font-semibold text-ink">{{ ghostLabel }}</span>
+        <span class="font-mono text-[9px] font-semibold tracking-wide text-ink">{{ ghostLabel }}</span>
       </div>
     </div>
   </div>
