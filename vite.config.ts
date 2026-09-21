@@ -16,7 +16,7 @@ export default defineConfig(({ command, mode }) => {
     }
     if (!env.VITE_WAITLIST_ENDPOINT) {
       console.warn(
-        '\n⚠ VITE_WAITLIST_ENDPOINT is not set — the email form will not store sign-ups. See docs/waitlist-google-sheet.md.\n',
+        '\n⚠ VITE_WAITLIST_ENDPOINT is not set — the email form will not store sign-ups. See README.md → "Waitlist sign-ups".\n',
       )
     }
   }

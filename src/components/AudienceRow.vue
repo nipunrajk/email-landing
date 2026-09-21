@@ -53,7 +53,7 @@ const audiences: Persona[] = [
 <template>
   <section
     id="audiences"
-    class="scroll-mt-24 border-y border-line bg-surface py-14 sm:py-16 xl:py-20"
+    class="border-y border-line bg-surface py-14 sm:py-16 xl:py-20"
   >
     <div class="shell">
       <!-- Section Header: Clean eyebrow on top, crisp title, and balanced layout -->

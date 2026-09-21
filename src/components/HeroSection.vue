@@ -58,7 +58,7 @@ const facts = ['No account needed', 'Figma frame import', 'HTML · MJML · React
         </ul>
       </div>
 
-      <div id="demo" class="mt-14 scroll-mt-24">
+      <div id="demo" class="mt-14">
         <EditorWorkbench />
       </div>
     </div>

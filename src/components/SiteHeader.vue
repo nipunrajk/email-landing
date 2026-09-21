@@ -1,18 +1,54 @@
 <script setup lang="ts">
+import { onBeforeUnmount, onMounted, ref } from 'vue'
 import { site } from '@/config'
 import BrandMark from '@/components/BrandMark.vue'
 import Icon from '@/components/Icon.vue'
 
+// Keep this in the same top-to-bottom order as the sections on the page,
+// otherwise clicking through the nav jumps up and down.
 const nav = [
-  { label: 'Product', href: '#product', active: true },
-  { label: 'Templates', href: '#templates' },
+  { label: 'Product', href: '#product' },
   { label: 'Integrations', href: '#exports' },
   { label: 'Showcase', href: '#audiences' },
+  { label: 'Templates', href: '#templates' },
 ]
+
+const header = ref<HTMLElement | null>(null)
+const activeHref = ref(nav[0].href)
+
+let frame = 0
+
+// The active item is the last section whose top has scrolled past the header.
+function updateActive() {
+  frame = 0
+  const line = (header.value?.getBoundingClientRect().bottom ?? 0) + 24
+  let current = nav[0].href
+  for (const item of nav) {
+    const el = document.querySelector(item.href)
+    if (el && el.getBoundingClientRect().top <= line) current = item.href
+  }
+  activeHref.value = current
+}
+
+function onScroll() {
+  if (!frame) frame = requestAnimationFrame(updateActive)
+}
+
+onMounted(() => {
+  updateActive()
+  window.addEventListener('scroll', onScroll, { passive: true })
+  window.addEventListener('resize', onScroll)
+})
+
+onBeforeUnmount(() => {
+  window.removeEventListener('scroll', onScroll)
+  window.removeEventListener('resize', onScroll)
+  if (frame) cancelAnimationFrame(frame)
+})
 </script>
 
 <template>
-  <header class="sticky top-0 z-50 border-b border-line bg-surface/90 backdrop-blur-md">
+  <header ref="header" class="sticky top-0 z-50 border-b border-line bg-surface/90 backdrop-blur-md">
     <div
       class="shell flex h-16 items-center justify-between gap-4 sm:h-20"
     >
@@ -30,7 +66,7 @@ const nav = [
           :href="item.href"
           class="text-[14.5px] transition-colors"
           :class="
-            item.active
+            item.href === activeHref
               ? 'font-semibold text-brand'
               : 'font-medium text-muted hover:text-ink'
           "
@@ -58,7 +94,7 @@ const nav = [
         :href="item.href"
         class="text-[13px] whitespace-nowrap transition-colors"
         :class="
-          item.active
+          item.href === activeHref
             ? 'font-semibold text-brand'
             : 'font-medium text-muted hover:text-ink'
         "

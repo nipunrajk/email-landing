@@ -90,7 +90,7 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <section id="product" class="scroll-mt-24 pt-14 pb-20 sm:pt-16 sm:pb-24 xl:pt-20 xl:pb-28">
+  <section id="product" class="pt-14 pb-20 sm:pt-16 sm:pb-24 xl:pt-20 xl:pb-28">
     <div class="shell">
       <div class="mx-auto mb-14 max-w-[740px] text-center sm:mb-20">
         <span
@@ -172,7 +172,7 @@ onUnmounted(() => {
         <!-- Card 2: One canvas, four exports -->
         <article
           id="exports"
-          class="flex scroll-mt-24 flex-col justify-between rounded-2xl border border-line bg-surface p-7 shadow-sm transition-shadow hover:shadow-md md:col-span-5 sm:p-8"
+          class="flex flex-col justify-between rounded-2xl border border-line bg-surface p-7 shadow-sm transition-shadow hover:shadow-md md:col-span-5 sm:p-8"
         >
           <div>
             <span class="mb-5 grid size-12 place-items-center rounded-xl bg-tint text-brand">
@@ -209,7 +209,7 @@ onUnmounted(() => {
           class="flex flex-col justify-between rounded-2xl border border-line bg-surface p-7 shadow-sm transition-shadow hover:shadow-md md:col-span-5 sm:p-8"
         >
           <div>
-            <span class="mb-5 grid size-12 place-items-center rounded-xl bg-mint-soft text-mint">
+            <span class="mb-5 grid size-12 place-items-center rounded-xl bg-tint text-brand">
               <Icon name="check-circle" class="size-6" />
             </span>
             <h3 class="mb-3 font-display text-[25px] leading-[1.15] font-medium tracking-[-0.015em] text-balance sm:text-[29px]">
@@ -312,7 +312,7 @@ onUnmounted(() => {
                 class="flex items-center gap-1 rounded px-2 py-1 font-mono text-[11px] font-medium text-white/50 transition-colors hover:text-white/90"
                 @click="copyCode"
               >
-                <Icon :name="copied ? 'check' : 'code'" class="size-3" />
+                <Icon :name="copied ? 'check' : 'copy'" class="size-3" />
                 {{ copied ? 'Copied' : 'Copy code' }}
               </button>
             </div>

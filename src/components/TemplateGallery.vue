@@ -142,7 +142,7 @@ function monogram(name: string) {
 </script>
 
 <template>
-  <section id="templates" class="scroll-mt-24 border-t border-line pt-14 pb-12 sm:pt-16 sm:pb-14 xl:pt-20 xl:pb-16">
+  <section id="templates" class="border-t border-line pt-14 pb-12 sm:pt-16 sm:pb-14 xl:pt-20 xl:pb-16">
     <div class="shell">
       <div class="mb-12 flex flex-col gap-8 md:flex-row md:items-end md:justify-between">
         <div class="max-w-[460px]">

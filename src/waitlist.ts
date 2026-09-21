@@ -4,7 +4,7 @@ export class WaitlistError extends Error {}
 
 /**
  * Appends an email to the Google Sheet behind the Apps Script web app
- * (see docs/waitlist-google-sheet.md).
+ * (setup: README.md → "Waitlist sign-ups").
  *
  * Apps Script doesn't answer CORS preflights, so this sends a "simple" request:
  * a text/plain body with mode 'no-cors'. The response is therefore opaque — a
