@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { onMounted, onUnmounted, ref, useTemplateRef } from 'vue'
+import { RouterLink } from 'vue-router'
 import { site } from '@/config'
 import { joinWaitlist } from '@/waitlist'
 import Icon from '@/components/Icon.vue'
@@ -24,6 +25,15 @@ const year = new Date().getFullYear()
 
 // Product capabilities, not trial/pricing terms — nothing here needs sourcing.
 const facts = ['No account needed', 'Figma frame import', 'HTML · MJML · React Email · Blade', 'Verified for Outlook & Gmail']
+
+// Mirrors SiteHeader's nav, in the same order, so the two ends of the page offer
+// the same path through the content.
+const footerNav = [
+  { label: 'Product', href: '#product' },
+  { label: 'Integrations', href: '#exports' },
+  { label: 'Showcase', href: '#audiences' },
+  { label: 'Templates', href: '#templates' },
+]
 
 const cardRef = useTemplateRef<HTMLDivElement>('cardRef')
 const spacerRef = useTemplateRef<HTMLDivElement>('spacerRef')
@@ -81,6 +91,23 @@ const GLYPH_THROTTLE_MS = 50
 const GLYPH_LIFETIME_MS = 350
 const glyphTimers = new Map<number, ReturnType<typeof setTimeout>>()
 
+// A ramp, not a bag of hues. Four of the five steps sit within 10° of the brand
+// hue in OKLCH (white carries no hue of its own), so the scatter reads as one
+// colour coming apart rather than as confetti. Weights keep white in the
+// majority and drop the deep brand step to the tail, so colour lands as an
+// accent instead of competing with the wordmark.
+//
+// Coral is the one deliberate exception — 115° from the brand, and it carries
+// "flagged" meaning elsewhere on the site — so it earns its place by being
+// scarce: one dot in fourteen, as a warm counterpoint against the violet.
+const CONFETTI_STEPS: [token: string, fallback: string, weight: number][] = [
+  ['--color-surface', '#ffffff', 6],
+  ['--color-tint', '#ede9fe', 3],
+  ['--color-brand-bright', '#a78bfa', 3],
+  ['--color-brand', '#6e44ff', 1],
+  ['--color-coral', '#9a4527', 1],
+]
+
 let CONFETTI_PALETTE: string[] = ['#ffffff']
 
 function resolveColor(varName: string, fallback: string): string {
@@ -89,15 +116,10 @@ function resolveColor(varName: string, fallback: string): string {
 }
 
 function resolveConfettiPalette() {
-  CONFETTI_PALETTE = [
-    '#ffffff',
-    resolveColor('--color-brand-bright', '#a78bfa'),
-    resolveColor('--color-tint', '#ede9fe'),
-    resolveColor('--color-mint', '#2d6a4a'),
-    resolveColor('--color-mint-soft', '#e2efe7'),
-    resolveColor('--color-coral', '#9a4527'),
-    resolveColor('--color-coral-soft', '#f5e4dc'),
-  ]
+  // Expanded into a flat bag so the sampling site stays a single array index.
+  CONFETTI_PALETTE = CONFETTI_STEPS.flatMap(([token, fallback, weight]) =>
+    Array.from({ length: weight }, () => resolveColor(token, fallback)),
+  )
 }
 
 const REVEAL_DURATION = 900
@@ -111,6 +133,7 @@ let canvasHeight = 0
 let rafId: number | null = null
 let resizeObserver: ResizeObserver | null = null
 let entranceObserver: IntersectionObserver | null = null
+let visibilityObserver: IntersectionObserver | null = null
 let resizePending = false
 let mql: MediaQueryList | null = null
 let prefersReducedMotion = false
@@ -240,7 +263,10 @@ async function rasterizeText(waitForFont: boolean) {
   const offCtx = offscreen.getContext('2d', { willReadFrequently: true })
   if (!offCtx) return
 
-  const targetWidth = width * 0.86
+  // Narrower than the card so the wordmark reads as a mark rather than a
+  // headline, and the tighter dot pitch below has enough resolution to keep the
+  // letterforms legible (at 11px pitch "G" and "e" were ambiguous).
+  const targetWidth = width * 0.72
   const maxFontSize = spacerLocalHeight * 0.7
 
   let lo = 10
@@ -262,8 +288,8 @@ async function rasterizeText(waitForFont: boolean) {
   offCtx.fillText(WORDMARK, width / 2, spacerLocalTop + spacerLocalHeight / 2)
 
   const isMobile = width < 480
-  const gap = isMobile ? 4 : 11
-  const dotRadius = isMobile ? 1.5 : 4.5
+  const gap = isMobile ? 3 : 8
+  const dotRadius = isMobile ? 1.2 : 3.2
   mouse.radius = isMobile ? 70 : 150
 
   const imageData = offCtx.getImageData(0, 0, width, height).data
@@ -286,6 +312,12 @@ async function rasterizeText(waitForFont: boolean) {
     }
   }
   dots = newDots
+
+  // Reassigning canvas.width above wipes every drawn pixel, so the static frame
+  // has to be repainted here. With motion enabled the rAF loop covers this on the
+  // next frame; under prefers-reduced-motion there is no loop, so without this
+  // the wordmark survives only until the first resize.
+  if (prefersReducedMotion) drawStaticFrame()
 }
 
 function scheduleEntranceReveal() {
@@ -420,6 +452,22 @@ onMounted(async () => {
       { threshold: 0.1 },
     )
     entranceObserver.observe(spacer)
+
+    // The footer is the last element on the page, so once it scrolls away the
+    // loop has nothing left to animate. Idle at 0 rather than repainting ~4k
+    // canvas dots every frame for the rest of the session.
+    visibilityObserver = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting && rafId === null) {
+          rafId = requestAnimationFrame(animate)
+        } else if (!entry.isIntersecting && rafId !== null) {
+          cancelAnimationFrame(rafId)
+          rafId = null
+        }
+      },
+      { threshold: 0 },
+    )
+    visibilityObserver.observe(card)
     rafId = requestAnimationFrame(animate)
   }
 })
@@ -428,6 +476,7 @@ onUnmounted(() => {
   if (rafId !== null) cancelAnimationFrame(rafId)
   resizeObserver?.disconnect()
   entranceObserver?.disconnect()
+  visibilityObserver?.disconnect()
   const card = cardRef.value
   card?.removeEventListener('pointermove', handlePointerMove)
   card?.removeEventListener('pointerleave', handlePointerLeave)
@@ -480,20 +529,13 @@ onUnmounted(() => {
             Take a Figma frame all the way to the inbox.
           </h2>
 
-          <p class="mx-auto mt-4 max-w-xl text-[16px] leading-relaxed text-white/70 sm:text-[18px]">
+          <p class="mx-auto mt-4 max-w-xl text-[16px] leading-relaxed text-pretty text-white/70 sm:text-[18px]">
             Import the frame, keep every block editable, export the format your stack already uses
             — then check it before you send.
           </p>
 
-          <div class="mt-8">
-            <a :href="site.editorUrl" class="btn btn-primary btn-lg !rounded-xl shadow-[0_4px_20px_rgba(110,68,255,0.45)]">
-              <Icon name="bolt" class="size-4" />
-              <span>Try the editor</span>
-            </a>
-          </div>
-
-          <div class="mx-auto mt-10 max-w-xl border-t border-white/10 pt-8">
-            <p class="text-[14px] leading-relaxed text-white/70">
+          <div class="mx-auto mt-9 max-w-xl">
+            <p class="text-[15px] leading-relaxed text-white/80">
               Some features are limited until the full release. Leave your email and we’ll tell you
               when it opens.
             </p>
@@ -509,7 +551,7 @@ onUnmounted(() => {
 
             <form
               v-else
-              class="mt-5 flex flex-col items-center justify-center gap-3 sm:flex-row"
+              class="mt-4 flex flex-col items-center justify-center gap-3 sm:flex-row"
               @submit.prevent="handleWaitlistSubmit"
             >
               <label class="sr-only" for="waitlist-email">Email address</label>
@@ -522,7 +564,7 @@ onUnmounted(() => {
                 placeholder="you@company.com"
                 required
                 :disabled="status === 'sending'"
-                class="h-12 w-full rounded-xl border border-white/15 bg-white/5 px-4 text-[14px] text-white placeholder-white/40 shadow-inner backdrop-blur-sm transition-colors focus:border-brand-bright focus:bg-white/10 focus:outline-none focus:ring-2 focus:ring-brand-bright/30 disabled:opacity-60 sm:w-[300px]"
+                class="h-12 w-full rounded-xl border border-white/25 bg-white/[0.05] px-4 text-[14px] text-white placeholder-white/60 shadow-inner backdrop-blur-sm transition-colors focus:border-brand-bright focus:bg-white/10 focus:outline-none focus:ring-2 focus:ring-brand-bright/30 disabled:opacity-60 sm:w-[300px]"
               />
               <!-- Honeypot: hidden from people and screen readers, bots fill it. -->
               <input
@@ -537,7 +579,7 @@ onUnmounted(() => {
               <button
                 type="submit"
                 :disabled="status === 'sending'"
-                class="inline-flex h-12 w-full items-center justify-center gap-2 rounded-xl border border-white/25 px-6 text-[14px] font-semibold text-white transition-all hover:bg-white/10 active:scale-[0.98] disabled:opacity-60 sm:w-auto"
+                class="inline-flex h-12 w-full items-center justify-center gap-2 rounded-xl bg-brand px-6 text-[14px] font-semibold text-white transition-colors hover:bg-brand-bright active:scale-[0.98] disabled:opacity-60 sm:w-auto"
               >
                 <span>{{ status === 'sending' ? 'Sending…' : 'Notify me' }}</span>
               </button>
@@ -547,9 +589,23 @@ onUnmounted(() => {
             </p>
           </div>
 
-          <div class="mt-6 flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-[12px] text-white/60">
-            <span v-for="fact in facts" :key="fact" class="inline-flex items-center gap-1.5">
-              <Icon name="check" class="size-3.5 text-brand-bright" />
+          <div class="mt-9 flex flex-col items-center gap-3">
+            <span class="text-[12px] text-white/45">Or start with the editor</span>
+            <a :href="site.editorUrl" class="btn btn-outline-invert btn-md !rounded-xl">
+              <Icon name="bolt" class="size-4" />
+              <span>Open the editor</span>
+            </a>
+          </div>
+
+          <div
+            class="mx-auto mt-10 grid max-w-xl grid-cols-1 gap-x-8 gap-y-2.5 text-[12px] text-white/60 sm:grid-cols-2"
+          >
+            <span
+              v-for="fact in facts"
+              :key="fact"
+              class="inline-flex items-center gap-1.5 sm:justify-center"
+            >
+              <Icon name="check" class="size-3.5 shrink-0 text-brand-bright" />
               <span>{{ fact }}</span>
             </span>
           </div>
@@ -558,9 +614,26 @@ onUnmounted(() => {
         <div ref="spacerRef" class="mt-8 h-[220px] w-full sm:h-[300px] lg:h-[380px]" aria-hidden="true" />
 
         <div
-          class="relative z-10 flex items-center justify-between border-t border-white/15 px-6 py-5 text-[13px] text-white/60 sm:px-12"
+          class="relative z-10 flex flex-col-reverse items-center gap-4 border-t border-white/15 px-6 py-6 text-[13px] text-white/60 sm:flex-row sm:justify-between sm:px-12"
         >
           <span>© {{ year }} {{ site.name }}</span>
+
+          <nav aria-label="Footer" class="flex flex-wrap items-center justify-center gap-x-6">
+            <a
+              v-for="item in footerNav"
+              :key="item.href"
+              :href="item.href"
+              class="inline-flex min-h-11 items-center rounded transition-colors duration-150 hover:text-white"
+            >
+              {{ item.label }}
+            </a>
+            <RouterLink
+              to="/privacy"
+              class="inline-flex min-h-11 items-center rounded transition-colors duration-150 hover:text-white"
+            >
+              Privacy
+            </RouterLink>
+          </nav>
         </div>
       </div>
     </div>

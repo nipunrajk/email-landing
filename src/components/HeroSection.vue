@@ -21,15 +21,15 @@ const facts = ['No account needed', 'Figma frame import', 'HTML · MJML · React
       <div class="text-center">
         <a
           href="#product"
-          class="inline-flex items-center gap-2 rounded-full border border-line-strong bg-surface px-3.5 py-1.5 shadow-sm transition-colors hover:border-brand"
+          class="inline-flex max-sm:items-start gap-2 rounded-full border border-line-strong bg-surface px-3.5 py-1.5 shadow-sm transition-colors hover:border-brand"
         >
           <span
             class="rounded-full bg-mint-soft px-2 py-0.5 font-mono text-[11px] font-semibold whitespace-nowrap text-mint"
           >
             Figma → email
           </span>
-          <span class="text-[13px] text-muted">Frames come in. Editable blocks come out.</span>
-          <Icon name="chevron-right" class="size-3.5 text-muted" />
+          <span class="text-[13px] text-pretty text-muted">Frames come in. Editable blocks come out.</span>
+          <Icon name="chevron-right" class="mt-0.5 size-3.5 shrink-0 text-muted" />
         </a>
 
         <h1
@@ -39,7 +39,7 @@ const facts = ['No account needed', 'Figma frame import', 'HTML · MJML · React
           <span class="block text-ink">Ship real email markup.</span>
         </h1>
 
-        <p class="mx-auto mt-6 max-w-[620px] text-[17px] leading-relaxed text-balance text-muted sm:text-[19px]">
+        <p class="mx-auto mt-6 max-w-[620px] text-[17px] leading-relaxed text-pretty text-muted sm:text-[19px]">
           Getdraft turns your frames into editable email blocks, exports clean HTML, MJML, React Email
           or Blade, and checks the inbox before you send.
         </p>

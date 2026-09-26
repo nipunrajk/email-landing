@@ -71,7 +71,7 @@ const audiences: Persona[] = [
               One canvas, three sets of expectations
             </h2>
           </div>
-          <p class="max-w-[340px] text-[14px] leading-relaxed text-muted sm:text-right">
+          <p class="max-w-[340px] text-[14px] leading-relaxed text-pretty text-muted sm:text-right">
             Figma design, marketing deliverability, and developer code in total sync.
           </p>
         </div>

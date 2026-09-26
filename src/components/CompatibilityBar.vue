@@ -284,7 +284,7 @@ onUnmounted(() => {
             :class="[
               activeIndex === idx
                 ? 'bg-surface text-ink border border-line-strong shadow-xs scale-105'
-                : 'text-muted/45 hover:text-ink hover:bg-surface/50 border border-transparent'
+                : 'text-muted/80 hover:text-ink hover:bg-surface/50 border border-transparent'
             ]"
             :aria-label="`${item.verb} ${item.name}`"
           >

@@ -122,13 +122,14 @@ const templates: Template[] = [
 const categories = ['All templates', 'E-commerce', 'SaaS', 'Newsletter', 'Campaigns']
 const activeCategory = ref('All templates')
 
-const visible = computed(() => {
-  const pool =
-    activeCategory.value === 'All templates'
-      ? templates
-      : templates.filter((t) => t.category === activeCategory.value)
-  return pool.slice(0, 3)
-})
+// Every card renders. The chips carry real counts, so a capped grid made them
+// read as broken promises — "Newsletter 5" over three cards with no way to
+// reach the other two.
+const visible = computed(() =>
+  activeCategory.value === 'All templates'
+    ? templates
+    : templates.filter((t) => t.category === activeCategory.value),
+)
 
 function countFor(category: string) {
   return category === 'All templates'
@@ -144,7 +145,7 @@ function monogram(name: string) {
 <template>
   <section id="templates" class="border-t border-line pt-14 pb-12 sm:pt-16 sm:pb-14 xl:pt-20 xl:pb-16">
     <div class="shell">
-      <div class="mb-12 flex flex-col gap-8 md:flex-row md:items-end md:justify-between">
+      <div class="mb-12 flex flex-col gap-8 md:flex-row md:items-center md:justify-between md:gap-12">
         <div class="max-w-[460px]">
           <span
             class="eyebrow"
@@ -156,7 +157,7 @@ function monogram(name: string) {
           >
             Tested layouts, ready to ship
           </h2>
-          <p class="mt-3 text-[15px] leading-relaxed text-muted text-balance">
+          <p class="mt-3 text-[15px] leading-relaxed text-pretty text-muted">
             Production email architectures built for 600px grids, automatic dark mode, and zero
             Outlook clipping.
           </p>
@@ -167,7 +168,7 @@ function monogram(name: string) {
             v-for="category in categories"
             :key="category"
             type="button"
-            class="inline-flex items-center gap-1.5 rounded-full border px-4 py-2 text-[13px] font-semibold transition-colors"
+            class="inline-flex min-h-11 items-center gap-1.5 rounded-full border px-4 text-[13px] font-semibold transition-colors"
             :class="
               activeCategory === category
                 ? 'border-brand bg-brand text-white shadow-sm'
@@ -177,7 +178,7 @@ function monogram(name: string) {
           >
             {{ category }}
             <span
-              class="rounded-md px-1.5 py-0.5 font-mono text-[11px]"
+              class="rounded-md px-1.5 py-0.5 font-mono text-[11px] tabular-nums"
               :class="activeCategory === category ? 'bg-white/20 text-white' : 'bg-subtle/80 text-muted'"
             >
               {{ countFor(category) }}
@@ -284,7 +285,7 @@ function monogram(name: string) {
                       />
                       <p class="mt-1 truncate text-[6px] font-semibold text-ink/80">Product {{ n + 1 }}</p>
                       <div class="mt-0.5 flex items-center justify-between">
-                        <span class="text-[6px] font-bold text-brand">${{ price }}</span>
+                        <span class="text-[6px] font-bold text-brand tabular-nums">${{ price }}</span>
                         <span class="rounded-full bg-tint px-1 py-[1px] text-[5.5px] font-bold text-brand">
                           Add
                         </span>
@@ -339,7 +340,7 @@ function monogram(name: string) {
             >
               <a
                 :href="site.editorUrl"
-                class="inline-flex items-center gap-1.5 rounded-full border border-line bg-surface px-4 py-2 font-mono text-[11.5px] font-semibold text-ink shadow-md transition-transform hover:scale-105"
+                class="inline-flex min-h-11 items-center gap-1.5 rounded-full border border-line bg-surface px-4 py-2 font-mono text-[11.5px] font-semibold text-ink shadow-md transition-transform hover:scale-105"
               >
                 Open in Editor
                 <Icon name="arrow-right" class="size-3 text-brand" />
@@ -354,11 +355,11 @@ function monogram(name: string) {
                 {{ tpl.category }}
               </span>
             </div>
-            <p class="mt-1.5 flex-1 text-[13px] leading-relaxed text-muted">
+            <p class="mt-1.5 flex-1 text-[13px] leading-relaxed text-pretty text-muted">
               {{ tpl.description }}
             </p>
             <div class="mt-5 flex items-center justify-between gap-2 border-t border-line pt-4 text-[11.5px]">
-              <span class="font-mono text-muted">{{ layoutSpecs[tpl.layout].spec }}</span>
+              <span class="font-mono text-muted tabular-nums">{{ layoutSpecs[tpl.layout].spec }}</span>
               <span class="flex shrink-0 items-center gap-1 font-mono font-semibold text-mint">
                 <Icon name="check" class="size-3" />
                 {{ layoutSpecs[tpl.layout].verified }}
@@ -371,12 +372,12 @@ function monogram(name: string) {
       <div class="mt-10 flex flex-col items-center gap-3 text-center sm:mt-12">
         <a
           :href="site.editorUrl"
-          class="inline-flex items-center gap-2 rounded-full border border-line-strong bg-surface px-6 py-3 text-[14px] font-semibold text-ink shadow-sm transition-all hover:border-brand/40 hover:shadow-md"
+          class="inline-flex min-h-11 items-center gap-2 rounded-full border border-line-strong bg-surface px-6 py-3 text-[14px] font-semibold text-ink shadow-sm transition-all hover:border-brand/40 hover:shadow-md"
         >
-          <span>Browse all {{ templates.length }} templates</span>
+          <span>Start from one in the editor</span>
           <Icon name="arrow-right" class="size-4 text-brand" />
         </a>
-        <p class="text-[13px] text-muted">
+        <p class="text-[13px] text-pretty text-muted">
           All {{ templates.length }} templates export to React Email, MJML, HTML, and Blade.
         </p>
       </div>

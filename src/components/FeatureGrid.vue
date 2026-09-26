@@ -104,7 +104,7 @@ onUnmounted(() => {
           Engineered for flawless inboxes and production-ready markup
         </h2>
         <p
-          class="mx-auto mt-4 max-w-[720px] text-[16px] leading-relaxed text-muted text-balance sm:text-[17px]"
+          class="mx-auto mt-4 max-w-[720px] text-[16px] leading-relaxed text-pretty text-muted sm:text-[17px]"
         >
           Say goodbye to broken tables, phantom padding, and Outlook rendering bugs.<br class="hidden sm:inline" />
           Getdraft keeps your Figma frames, clean code, and inboxes in total agreement.
@@ -114,22 +114,22 @@ onUnmounted(() => {
       <div class="grid gap-6 md:grid-cols-12">
         <!-- Card 1: Frames become blocks -->
         <article
-          class="flex flex-col justify-between rounded-2xl border border-line bg-surface p-7 shadow-sm transition-shadow hover:shadow-md md:col-span-7 sm:p-8"
+          class="flex flex-col rounded-2xl border border-line bg-surface p-7 shadow-sm transition-shadow hover:shadow-md md:col-span-7 sm:p-8"
         >
-          <div class="mb-8 max-w-md">
+          <div class="mb-7 max-w-md">
             <span class="mb-5 grid size-12 place-items-center rounded-xl bg-tint text-brand">
               <Icon name="frame" class="size-6" />
             </span>
-            <h3 class="mb-3 font-display text-[25px] leading-[1.15] font-medium tracking-[-0.015em] text-balance sm:text-[29px]">
+            <h3 class="mb-3 min-h-[2.3em] font-display text-[25px] leading-[1.15] font-medium tracking-[-0.015em] text-balance sm:text-[29px]">
               Frames become blocks, not screenshots
             </h3>
-            <p class="text-[15px] leading-relaxed text-muted">
+            <p class="min-h-[4.88em] text-[15px] leading-relaxed text-pretty text-muted">
               Import a layout and Getdraft turns it into editable email blocks — columns, type, images
               — instead of a flattened picture you can’t fix later.
             </p>
           </div>
 
-          <div class="rounded-xl border border-line-strong bg-canvas p-4">
+          <div class="flex-1 rounded-xl border border-line-strong bg-canvas p-4">
             <div
               class="mb-3 flex items-center justify-between border-b border-line pb-3 text-[12px] text-muted"
             >
@@ -172,22 +172,22 @@ onUnmounted(() => {
         <!-- Card 2: One canvas, four exports -->
         <article
           id="exports"
-          class="flex flex-col justify-between rounded-2xl border border-line bg-surface p-7 shadow-sm transition-shadow hover:shadow-md md:col-span-5 sm:p-8"
+          class="flex flex-col rounded-2xl border border-line bg-surface p-7 shadow-sm transition-shadow hover:shadow-md md:col-span-5 sm:p-8"
         >
-          <div>
+          <div class="mb-7">
             <span class="mb-5 grid size-12 place-items-center rounded-xl bg-tint text-brand">
               <Icon name="code" class="size-6" />
             </span>
-            <h3 class="mb-3 font-display text-[25px] leading-[1.15] font-medium tracking-[-0.015em] text-balance sm:text-[29px]">
+            <h3 class="mb-3 min-h-[2.3em] font-display text-[25px] leading-[1.15] font-medium tracking-[-0.015em] text-balance sm:text-[29px]">
               One canvas, four exports
             </h3>
-            <p class="mb-6 text-[15px] leading-relaxed text-muted">
+            <p class="min-h-[4.88em] text-[15px] leading-relaxed text-pretty text-muted">
               HTML, MJML, React Email, or Blade. The same design, four outputs that still look like
               themselves in Gmail, Outlook, and the rest.
             </p>
           </div>
 
-          <div class="divide-y divide-line overflow-hidden rounded-xl border border-line bg-canvas">
+          <div class="flex-1 divide-y divide-line overflow-hidden rounded-xl border border-line bg-canvas">
             <div
               v-for="format in formats"
               :key="format.name"
@@ -206,22 +206,22 @@ onUnmounted(() => {
 
         <!-- Card 3: Catch it before the send -->
         <article
-          class="flex flex-col justify-between rounded-2xl border border-line bg-surface p-7 shadow-sm transition-shadow hover:shadow-md md:col-span-5 sm:p-8"
+          class="flex flex-col rounded-2xl border border-line bg-surface p-7 shadow-sm transition-shadow hover:shadow-md md:col-span-5 sm:p-8"
         >
-          <div>
+          <div class="mb-7">
             <span class="mb-5 grid size-12 place-items-center rounded-xl bg-tint text-brand">
               <Icon name="check-circle" class="size-6" />
             </span>
-            <h3 class="mb-3 font-display text-[25px] leading-[1.15] font-medium tracking-[-0.015em] text-balance sm:text-[29px]">
+            <h3 class="mb-3 min-h-[2.3em] font-display text-[25px] leading-[1.15] font-medium tracking-[-0.015em] text-balance sm:text-[29px]">
               Catch it before the send
             </h3>
-            <p class="mb-6 text-[15px] leading-relaxed text-muted">
+            <p class="min-h-[4.88em] text-[15px] leading-relaxed text-pretty text-muted">
               Clipping, shaky clients, and risky CSS surface while you’re still on the canvas — not
               after the campaign is out.
             </p>
           </div>
 
-          <div class="divide-y divide-line overflow-hidden rounded-xl border border-line bg-canvas">
+          <div class="flex-1 divide-y divide-line overflow-hidden rounded-xl border border-line bg-canvas">
             <div
               v-for="check in staticChecks"
               :key="check.name"
@@ -276,29 +276,29 @@ onUnmounted(() => {
 
         <!-- Card 4: Markup you'd be happy to own -->
         <article
-          class="flex flex-col justify-between rounded-2xl border border-line bg-surface p-7 shadow-sm transition-shadow hover:shadow-md md:col-span-7 sm:p-8"
+          class="flex flex-col rounded-2xl border border-line bg-surface p-7 shadow-sm transition-shadow hover:shadow-md md:col-span-7 sm:p-8"
         >
-          <div class="mb-6 max-w-md">
+          <div class="mb-7 max-w-md">
             <span class="mb-5 grid size-12 place-items-center rounded-xl bg-tint text-brand">
               <Icon name="layers" class="size-6" />
             </span>
-            <h3 class="mb-3 font-display text-[25px] leading-[1.15] font-medium tracking-[-0.015em] text-balance sm:text-[29px]">
+            <h3 class="mb-3 min-h-[2.3em] font-display text-[25px] leading-[1.15] font-medium tracking-[-0.015em] text-balance sm:text-[29px]">
               Markup you’d be happy to own
             </h3>
-            <p class="text-[15px] leading-relaxed text-muted">
+            <p class="min-h-[4.88em] text-[15px] leading-relaxed text-pretty text-muted">
               Readable, structured output you can commit and diff — instead of a nested-table
               artifact nobody on the team wants to touch.
             </p>
           </div>
 
-          <div class="overflow-hidden rounded-xl border border-line-strong bg-ink-deep">
+          <div class="flex-1 overflow-hidden rounded-xl border border-line-strong bg-ink-deep">
             <div class="flex items-center justify-between border-b border-white/10 bg-white/5 px-3 py-2">
               <div class="flex gap-1">
                 <button
                   v-for="format in codeFormats"
                   :key="format.id"
                   type="button"
-                  class="rounded px-2.5 py-1 font-mono text-[11px] font-semibold transition-colors"
+                  class="inline-flex min-h-11 items-center rounded px-2.5 font-mono text-[11px] font-semibold transition-colors"
                   :class="
                     activeFormat === format.id ? 'bg-brand text-white' : 'text-white/50 hover:text-white/80'
                   "
@@ -309,7 +309,7 @@ onUnmounted(() => {
               </div>
               <button
                 type="button"
-                class="flex items-center gap-1 rounded px-2 py-1 font-mono text-[11px] font-medium text-white/50 transition-colors hover:text-white/90"
+                class="inline-flex min-h-11 items-center gap-1 rounded px-2 font-mono text-[11px] font-medium text-white/50 transition-colors hover:text-white/90"
                 @click="copyCode"
               >
                 <Icon :name="copied ? 'check' : 'copy'" class="size-3" />
@@ -318,7 +318,7 @@ onUnmounted(() => {
             </div>
 
             <div class="flex h-[208px] overflow-x-auto p-4 font-mono text-[11.5px] leading-relaxed">
-              <div class="mr-4 flex shrink-0 flex-col text-right text-white/25 select-none">
+              <div class="mr-4 flex shrink-0 flex-col text-right text-white/25 tabular-nums select-none">
                 <span v-for="(_, i) in codeLines" :key="i">{{ String(i + 1).padStart(2, '0') }}</span>
               </div>
               <div class="flex-1">

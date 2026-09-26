@@ -106,4 +106,5 @@ the row was written.
 
 Tag your LinkedIn link with `?utm_source=linkedin` and the channel lands in the **Source**
 column. The page can't read the script's reply, so always confirm with a real submission.
-Emails are personal data: mention what you collect and why in your privacy policy.
+Emails are personal data: `/privacy` states what is collected and why, and the footer links to
+it. Keep that page accurate if the fields above change.

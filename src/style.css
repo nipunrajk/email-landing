@@ -203,7 +203,6 @@ button:focus-visible {
 .btn-primary {
   background: var(--color-brand);
   color: #fff;
-  box-shadow: 0 6px 16px -8px rgba(110, 68, 255, 0.55);
 }
 
 .btn-primary:hover {

@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { onBeforeUnmount, onMounted, ref } from 'vue'
+import { onBeforeUnmount, onMounted, ref, watch } from 'vue'
+import { useRoute } from 'vue-router'
 import { site } from '@/config'
 import BrandMark from '@/components/BrandMark.vue'
 import Icon from '@/components/Icon.vue'
@@ -13,6 +14,14 @@ const nav = [
   { label: 'Templates', href: '#templates' },
 ]
 
+const route = useRoute()
+
+// The section anchors only exist on the home view, so from /privacy they have to
+// be addressed as absolute paths or the browser looks for a #product that isn't
+// in the document and nothing scrolls.
+const isHome = () => route.path === '/'
+const linkFor = (href: string) => (isHome() ? href : `/${href}`)
+
 const header = ref<HTMLElement | null>(null)
 const activeHref = ref(nav[0].href)
 
@@ -21,6 +30,7 @@ let frame = 0
 // The active item is the last section whose top has scrolled past the header.
 function updateActive() {
   frame = 0
+  if (!isHome()) return
   const line = (header.value?.getBoundingClientRect().bottom ?? 0) + 24
   let current = nav[0].href
   for (const item of nav) {
@@ -40,6 +50,8 @@ onMounted(() => {
   window.addEventListener('resize', onScroll)
 })
 
+watch(() => route.fullPath, updateActive)
+
 onBeforeUnmount(() => {
   window.removeEventListener('scroll', onScroll)
   window.removeEventListener('resize', onScroll)
@@ -52,7 +64,7 @@ onBeforeUnmount(() => {
     <div
       class="shell flex h-16 items-center justify-between gap-4 sm:h-20"
     >
-      <a href="#top" class="group flex items-center gap-2.5 text-ink transition-opacity duration-150 hover:opacity-85">
+      <a href="#top" class="group flex min-h-11 items-center gap-2.5 text-ink transition-opacity duration-150 hover:opacity-85">
         <BrandMark class="size-8 sm:size-9 shadow-xs" />
         <span class="font-sans text-[20px] font-extrabold tracking-[-0.03em] uppercase text-ink sm:text-[22px]">
           {{ site.name }}
@@ -63,7 +75,7 @@ onBeforeUnmount(() => {
         <a
           v-for="item in nav"
           :key="item.href"
-          :href="item.href"
+          :href="linkFor(item.href)"
           class="text-[14.5px] transition-colors"
           :class="
             item.href === activeHref
@@ -78,7 +90,7 @@ onBeforeUnmount(() => {
       <div class="flex items-center gap-4 sm:gap-6">
         <a
           :href="site.editorUrl"
-          class="inline-flex h-10 items-center justify-center gap-2 rounded-xl bg-brand px-4 text-[14px] font-semibold whitespace-nowrap text-white sm:px-5 shadow-sm transition-all hover:bg-brand-deep active:scale-[0.98]"
+          class="inline-flex h-11 items-center justify-center gap-2 rounded-xl bg-brand px-4 text-[14px] font-semibold whitespace-nowrap text-white sm:px-5 shadow-sm transition-all hover:bg-brand-deep active:scale-[0.98]"
         >
           <span class="sm:hidden">Try it</span>
           <span class="hidden sm:inline">Try the editor</span>
@@ -91,8 +103,8 @@ onBeforeUnmount(() => {
       <a
         v-for="item in nav"
         :key="item.href"
-        :href="item.href"
-        class="text-[13px] whitespace-nowrap transition-colors"
+        :href="linkFor(item.href)"
+        class="inline-flex min-h-11 items-center text-[13px] whitespace-nowrap transition-colors"
         :class="
           item.href === activeHref
             ? 'font-semibold text-brand'
