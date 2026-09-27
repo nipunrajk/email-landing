@@ -105,7 +105,7 @@ const audiences: Persona[] = [
                 class="flex items-start gap-2.5"
               >
                 <span
-                  class="mt-0.5 grid size-4 shrink-0 place-items-center rounded-full bg-mint-soft text-mint"
+                  class="mt-0.5 grid size-4 shrink-0 place-items-center rounded-full bg-tint text-brand"
                 >
                   <Icon name="check" class="size-2.5 stroke-[2.5]" />
                 </span>

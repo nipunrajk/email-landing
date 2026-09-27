@@ -121,20 +121,50 @@ const templates: Template[] = [
 
 const categories = ['All templates', 'E-commerce', 'SaaS', 'Newsletter', 'Campaigns']
 const activeCategory = ref('All templates')
+const showAll = ref(false)
 
-// Every card renders. The chips carry real counts, so a capped grid made them
-// read as broken promises — "Newsletter 5" over three cards with no way to
-// reach the other two.
-const visible = computed(() =>
-  activeCategory.value === 'All templates'
+// A catalogue is something you browse, not a wall you scroll. Fifteen cards in
+// one continuous stretch reads as a dump, so the default view is a hand-picked
+// six that covers all four categories. The rest is one click away and the button
+// says how many, so nothing is hidden behind a vague "load more".
+//
+// Ordered so no two neighbours repeat a preview. `article` and `list` are the
+// same 600px editorial architecture and render an identical mock, so they count
+// as one look here — this sequence stays clean at 1, 2 and 3 columns. The order
+// is applied explicitly rather than inherited from the source array, so editing
+// `templates` cannot silently break it.
+const FEATURED = [
+  'SaaS Welcome', // hero     · SaaS
+  'Product showcase', // grid      · E-commerce
+  'Monthly digest', // editorial · Newsletter
+  'Abandoned Cart', // grid      · E-commerce
+  'Brand story', // hero     · Campaigns
+  'Event invitation', // editorial · Campaigns
+]
+
+function inCategory(category: string) {
+  return category === 'All templates'
     ? templates
-    : templates.filter((t) => t.category === activeCategory.value),
-)
+    : templates.filter((t) => t.category === category)
+}
+
+// A category is at most five templates, so a category view is never a wall and
+// always shows itself in full. Only the unfiltered view needs the cut.
+const visible = computed(() => {
+  const pool = inCategory(activeCategory.value)
+  if (activeCategory.value !== 'All templates' || showAll.value) return pool
+  return FEATURED.map((name) => pool.find((t) => t.name === name)).filter(
+    (t): t is Template => Boolean(t),
+  )
+})
+
+function selectCategory(category: string) {
+  activeCategory.value = category
+  showAll.value = false
+}
 
 function countFor(category: string) {
-  return category === 'All templates'
-    ? templates.length
-    : templates.filter((t) => t.category === category).length
+  return inCategory(category).length
 }
 
 function monogram(name: string) {
@@ -163,7 +193,7 @@ function monogram(name: string) {
           </p>
         </div>
 
-        <div class="flex flex-wrap gap-2">
+        <div class="-mx-1 flex gap-2 overflow-x-auto px-1 pb-1 lg:mx-0 lg:flex-wrap lg:overflow-x-visible lg:px-0 lg:pb-0">
           <button
             v-for="category in categories"
             :key="category"
@@ -174,7 +204,7 @@ function monogram(name: string) {
                 ? 'border-brand bg-brand text-white shadow-sm'
                 : 'border-line bg-surface text-muted hover:border-line-strong hover:text-ink'
             "
-            @click="activeCategory = category"
+            @click="selectCategory(category)"
           >
             {{ category }}
             <span
@@ -190,15 +220,15 @@ function monogram(name: string) {
       <TransitionGroup
         tag="div"
         name="card"
-        class="grid gap-6 md:grid-cols-3"
+        class="grid gap-5 sm:grid-cols-2 sm:gap-6 md:grid-cols-3"
         :style="{ minHeight: '1px' }"
       >
         <article
           v-for="tpl in visible"
           :key="tpl.name"
-          class="group flex flex-col overflow-hidden rounded-2xl border border-line bg-surface shadow-sm transition-all duration-200 hover:-translate-y-1.5 hover:border-line-strong hover:shadow-[0_20px_40px_-15px_rgba(15,29,40,0.12)]"
+          class="group relative flex flex-col overflow-hidden rounded-2xl border border-line bg-surface shadow-sm transition-all duration-200 hover:-translate-y-1.5 hover:border-line-strong hover:shadow-[0_20px_40px_-15px_rgba(15,29,40,0.12)] focus-within:-translate-y-1.5 focus-within:border-line-strong"
         >
-          <div class="relative flex h-64 flex-col items-center overflow-hidden bg-canvas pt-4">
+          <div class="relative flex aspect-[4/3] flex-col items-center overflow-hidden bg-canvas pt-4">
             <!-- client-chrome strip -->
             <div class="mb-2.5 flex w-[82%] items-center justify-between">
               <div class="flex gap-1" aria-hidden="true">
@@ -334,52 +364,79 @@ function monogram(name: string) {
               </div>
             </div>
 
-            <!-- hover overlay -->
+            <!-- The card's real hit target is the stretched link at the bottom of
+                 <article>. These two are affordance only, never the target.
+                 The backdrop is a desktop hover flourish. The pill is revealed on
+                 hover there, but stays up on touch — with no hover to reveal it
+                 and nothing else labelling the card, a hidden pill left the whole
+                 grid looking like static artwork. It carries no backdrop there,
+                 so the preview underneath stays readable. -->
             <div
-              class="pointer-events-none absolute inset-0 flex items-center justify-center bg-ink/10 opacity-0 backdrop-blur-[2px] transition-all duration-200 group-hover:pointer-events-auto group-hover:opacity-100"
+              aria-hidden="true"
+              class="pointer-events-none absolute inset-0 bg-ink/10 opacity-0 backdrop-blur-[2px] transition-opacity duration-200 group-hover:opacity-100"
+            />
+            <span
+              aria-hidden="true"
+              class="pointer-events-none absolute inset-0 flex items-center justify-center max-md:items-end max-md:pb-3"
             >
-              <a
-                :href="site.editorUrl"
-                class="inline-flex min-h-11 items-center gap-1.5 rounded-full border border-line bg-surface px-4 py-2 font-mono text-[11.5px] font-semibold text-ink shadow-md transition-transform hover:scale-105"
+              <span
+                class="inline-flex min-h-11 items-center gap-1.5 rounded-full border border-line bg-surface px-4 py-2 font-mono text-[11.5px] font-semibold text-ink opacity-0 shadow-md transition-all duration-200 group-hover:scale-105 group-hover:opacity-100 max-md:opacity-100"
               >
                 Open in Editor
                 <Icon name="arrow-right" class="size-3 text-brand" />
-              </a>
-            </div>
+              </span>
+            </span>
           </div>
 
           <div class="flex flex-1 flex-col p-6">
-            <div class="flex items-center justify-between gap-2">
+            <div class="flex flex-wrap items-center justify-between gap-x-2 gap-y-1.5">
               <h3 class="font-display text-[20px] leading-tight font-medium tracking-[-0.015em]">{{ tpl.name }}</h3>
               <span class="shrink-0 rounded-full bg-subtle px-2 py-0.5 font-mono text-[10px] font-bold text-muted">
                 {{ tpl.category }}
               </span>
             </div>
-            <p class="mt-1.5 flex-1 text-[13px] leading-relaxed text-pretty text-muted">
+            <p class="mt-1.5 flex-1 text-[13px] leading-relaxed text-pretty text-muted max-md:line-clamp-2">
               {{ tpl.description }}
             </p>
-            <div class="mt-5 flex items-center justify-between gap-2 border-t border-line pt-4 text-[11.5px]">
+            <div class="mt-5 flex flex-wrap items-center justify-between gap-x-3 gap-y-1.5 border-t border-line pt-4 text-[11.5px]">
               <span class="font-mono text-muted tabular-nums">{{ layoutSpecs[tpl.layout].spec }}</span>
-              <span class="flex shrink-0 items-center gap-1 font-mono font-semibold text-mint">
-                <Icon name="check" class="size-3" />
+              <span class="flex items-center gap-1 font-mono font-semibold text-mint">
+                <Icon name="check" class="size-3 shrink-0" />
                 {{ layoutSpecs[tpl.layout].verified }}
               </span>
             </div>
           </div>
+
+          <!-- The card's one real action. Stretched over the whole card so a tap,
+               a click and a keyboard focus all land on it — the overlay above is
+               decoration, not the hit target. -->
+          <a
+            :href="site.editorUrl"
+            class="absolute inset-0 z-10 rounded-2xl focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand"
+          >
+            <span class="sr-only">Open “{{ tpl.name }}” in the editor</span>
+          </a>
         </article>
       </TransitionGroup>
 
-      <div class="mt-10 flex flex-col items-center gap-3 text-center sm:mt-12">
-        <a
-          :href="site.editorUrl"
-          class="inline-flex min-h-11 items-center gap-2 rounded-full border border-line-strong bg-surface px-6 py-3 text-[14px] font-semibold text-ink shadow-sm transition-all hover:border-brand/40 hover:shadow-md"
+      <!-- Progressive disclosure, in the grid's own measure so it doesn't read as a
+           separate section. Reserves its row either way, so expanding the grid
+           below it doesn't shift this control. -->
+      <div class="mt-8 flex min-h-11 justify-center">
+        <button
+          v-if="activeCategory === 'All templates'"
+          type="button"
+          class="inline-flex min-h-11 items-center gap-2 rounded-full border border-line-strong bg-surface px-5 py-2.5 text-[14px] font-semibold text-ink shadow-sm transition-all hover:border-brand/40 hover:shadow-md"
+          :aria-expanded="showAll"
+          @click="showAll = !showAll"
         >
-          <span>Start from one in the editor</span>
-          <Icon name="arrow-right" class="size-4 text-brand" />
-        </a>
-        <p class="text-[13px] text-pretty text-muted">
-          All {{ templates.length }} templates export to React Email, MJML, HTML, and Blade.
-        </p>
+          <span v-if="!showAll">Show all {{ templates.length }} templates</span>
+          <span v-else>Show fewer</span>
+          <Icon
+            :name="showAll ? 'chevron-up' : 'chevron-down'"
+            class="size-4 text-brand"
+          />
+        </button>
       </div>
     </div>
   </section>

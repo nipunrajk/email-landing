@@ -53,7 +53,7 @@ enforced by a pre-commit hook (§5).** Do not edit one copy.
 | `--color-brand` | `#123c5a` | Cyanotype Prussian Blue. Primary CTAs, active states, focus rings. | white **11.54:1** · text on canvas **10.16:1** |
 | `--color-brand-bright` | `#2e7fa6` | Wet print. **Dark grounds and focus halos only.** | **3.93:1** on canvas — never small text on light |
 | `--color-brand-deep` | `#0c2c42` | Pressed state. | white **14.44:1** |
-| `--color-tint` | `#e1edf4` | Plate wash: badge fills, icon containers. | — |
+| `--color-tint` | `#d3ecff` | Plate wash: badge fills, icon containers. | — |
 
 ### Status — never decoration
 

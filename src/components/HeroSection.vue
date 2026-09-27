@@ -13,7 +13,7 @@ const facts = ['No account needed', 'Figma frame import', 'HTML · MJML · React
       aria-hidden="true"
     >
       <div
-        class="h-[520px] w-[900px] max-w-full rounded-full bg-gradient-to-tr from-tint via-canvas to-transparent blur-3xl"
+        class="h-[520px] w-[900px] max-w-full rounded-full bg-gradient-to-tr from-brand-bright/30 via-brand-bright/10 to-transparent blur-3xl"
       />
     </div>
 
@@ -24,7 +24,7 @@ const facts = ['No account needed', 'Figma frame import', 'HTML · MJML · React
           class="inline-flex max-sm:items-start gap-2 rounded-full border border-line-strong bg-surface px-3.5 py-1.5 shadow-sm transition-colors hover:border-brand"
         >
           <span
-            class="rounded-full bg-mint-soft px-2 py-0.5 font-mono text-[11px] font-semibold whitespace-nowrap text-mint"
+            class="rounded-full bg-tint px-2 py-0.5 font-mono text-[11px] font-semibold whitespace-nowrap text-brand"
           >
             Figma → email
           </span>
@@ -52,7 +52,7 @@ const facts = ['No account needed', 'Figma frame import', 'HTML · MJML · React
           class="mt-8 flex flex-wrap items-center justify-center gap-x-6 gap-y-3 text-[13px] text-muted"
         >
           <li v-for="fact in facts" :key="fact" class="flex items-center gap-1.5">
-            <Icon name="check-circle" class="size-4 text-mint" />
+            <Icon name="check-circle" class="size-4 text-brand" />
             {{ fact }}
           </li>
         </ul>

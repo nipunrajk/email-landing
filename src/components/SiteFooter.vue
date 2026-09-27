@@ -389,6 +389,11 @@ function scheduleResize() {
 }
 
 function handlePointerMove(e: PointerEvent) {
+  // The repel is a hover affordance. A touch device has no hover, so an ordinary
+  // scroll gesture fires pointermove and blows the wordmark apart — and because
+  // a finger lifting while still inside the card never fires pointerleave, the
+  // pointer stays parked there and the dots never come home. Ignore touch.
+  if (e.pointerType === 'touch') return
   const card = cardRef.value
   if (!card) return
   const rect = card.getBoundingClientRect()
@@ -435,6 +440,7 @@ onMounted(async () => {
 
   card.addEventListener('pointermove', handlePointerMove)
   card.addEventListener('pointerleave', handlePointerLeave)
+  card.addEventListener('pointercancel', handlePointerLeave)
 
   if (prefersReducedMotion) {
     hasRevealed = true
@@ -480,6 +486,7 @@ onUnmounted(() => {
   const card = cardRef.value
   card?.removeEventListener('pointermove', handlePointerMove)
   card?.removeEventListener('pointerleave', handlePointerLeave)
+  card?.removeEventListener('pointercancel', handlePointerLeave)
   mql?.removeEventListener('change', handleMotionPrefChange)
   clearAllGlyphs()
 })
@@ -616,7 +623,7 @@ onUnmounted(() => {
           </div>
         </div>
 
-        <div ref="spacerRef" class="mt-8 h-[220px] w-full sm:h-[300px] lg:h-[380px]" aria-hidden="true" />
+        <div ref="spacerRef" class="mt-6 h-[150px] w-full sm:mt-8 sm:h-[300px] lg:h-[380px]" aria-hidden="true" />
 
         <div
           class="relative z-10 flex flex-col-reverse items-center gap-4 border-t border-white/15 px-6 py-6 text-[13px] text-white/60 sm:flex-row sm:justify-between sm:px-12"
