@@ -99,12 +99,12 @@ const glyphTimers = new Map<number, ReturnType<typeof setTimeout>>()
 //
 // Coral is the one deliberate exception — 115° from the brand, and it carries
 // "flagged" meaning elsewhere on the site — so it earns its place by being
-// scarce: one dot in fourteen, as a warm counterpoint against the violet.
+// scarce: one dot in fourteen, as a warm counterpoint against the blue.
 const CONFETTI_STEPS: [token: string, fallback: string, weight: number][] = [
   ['--color-surface', '#ffffff', 6],
-  ['--color-tint', '#ede9fe', 3],
-  ['--color-brand-bright', '#a78bfa', 3],
-  ['--color-brand', '#6e44ff', 1],
+  ['--color-tint', '#e1edf4', 3],
+  ['--color-brand-bright', '#2e7fa6', 3],
+  ['--color-brand', '#123c5a', 1],
   ['--color-coral', '#9a4527', 1],
 ]
 
@@ -198,7 +198,7 @@ function maybeEmitGlyphs(x: number, y: number) {
   const isMobile = canvasWidth < 480
   const count = 1 + Math.floor(Math.random() * 3)
   const fontSize = isMobile ? 6 : 16
-  const glyphPalette = ['#a78bfa', '#6e44ff', 'rgba(255,255,255,0.45)']
+  const glyphPalette = ['#2e7fa6', '#123c5a', 'rgba(255,255,255,0.45)']
 
   for (let i = 0; i < count; i++) {
     const angle = Math.random() * Math.PI * 2
@@ -576,10 +576,15 @@ onUnmounted(() => {
                 aria-hidden="true"
                 class="absolute -left-[9999px] size-0 opacity-0"
               />
+              <!-- Inverted rather than brand-filled: --color-brand is 1.4:1 against
+                   --color-ink-deep, so a navy button disappears into the card, and
+                   --color-brand-bright sits in a dead zone where no label colour
+                   clears 4.5:1. The sheet on the darkroom table reads as primary at
+                   17:1 and is what the surface token is for. -->
               <button
                 type="submit"
                 :disabled="status === 'sending'"
-                class="inline-flex h-12 w-full items-center justify-center gap-2 rounded-xl bg-brand px-6 text-[14px] font-semibold text-white transition-colors hover:bg-brand-bright active:scale-[0.98] disabled:opacity-60 sm:w-auto"
+                class="inline-flex h-12 w-full items-center justify-center gap-2 rounded-xl bg-surface px-6 text-[14px] font-semibold text-ink transition-colors hover:bg-subtle active:scale-[0.98] disabled:opacity-60 sm:w-auto"
               >
                 <span>{{ status === 'sending' ? 'Sending…' : 'Notify me' }}</span>
               </button>

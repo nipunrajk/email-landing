@@ -3,64 +3,66 @@
 /* ---------------------------------------------------------------------------
    COLOR SYSTEM — one identity across the marketing site and the editor
 
-   The brand anchor is NOT a choice made here. The shipped editor (email-canvas)
-   has run on Spherule Violet #6E44FF since it was built — it's --primary, --ring,
-   every active pill and selection outline in the app. A visitor clicks "Try the
-   editor" and lands in that violet, so the site has to be the same violet or the
-   handoff reads as two different products.
+   The brand anchor is Cyanotype Prussian Blue #123c5a, and it is not a
+   preference made here: it is the shipped editor's --color-brand, copied from
+   email-canvas/src/app/globals.css. A visitor clicks "Try the editor" and
+   lands in that blue, so the site has to be the same blue or the handoff reads
+   as two different products.
 
-   Worth noting: the site was never actually matching. It used #5e23e6 — a
-   near-miss of the product's #6E44FF, close enough to look like a mistake rather
-   than a decision. These three brand tokens are now copied verbatim from the
-   app's globals.css so there is exactly one source of truth:
-       --primary      #6e44ff  →  --color-brand
-       --primary-glow #a78bfa  →  --color-brand-bright
-       --primary-soft #ede9fe  →  --color-tint
+   This file previously anchored on Spherule Violet #6e44ff and documented that
+   choice at length. That was true until the editor was re-themed, and it left
+   this page asserting a consistency it did not have. Violet was also the wrong
+   colour on its own terms, and the editor's own notes say so: in OKLCH it is
+   L 55.5 / C 0.257 / H 285, which is a 41-degree hue rotation off the ink
+   neutrals below and a shade more chromatic than Tailwind's violet-600. Brand
+   and ink have to share a plate, or the accent reads as a sticker.
 
-   What the site contributes is the SURROUND. A brand color is only one token;
-   the neutrals it sits on decide whether it reads as considered or as a default
-   purple SaaS page. So the greys here are drawn from proofing — the blueline
-   contact print you pull to check registration before committing to a press you
-   can't undo, which is exactly the job Getdraft does between Figma and a send.
-   Every neutral carries a cool blue undertone, which is what lets violet sit on
-   them without clashing (violet on warm cream would fight; violet on tinted
-   proofing stock agrees).
+   Cyanotype is L 34.3 / C 0.070 / H 244 — the same hue family as the neutrals,
+   so the accent and the text belong to one system. It is also what the proofing
+   metaphor actually predicts: the blueline contact print you pull to check
+   registration before committing to a press you can't undo, which is precisely
+   the job Getdraft does between Figma and a send.
+
+   The neutrals were always right and did not move. They are drawn from proofing
+   stock rather than from a gray UI kit, and every one carries the same cool
+   undertone as the brand — which is the property that lets the accent sit on
+   them without either clashing or disappearing.
 
    --color-canvas   #edf1f4  Cool proofing-table paper. Tinted stock, not a
-                             neutral gray UI shell.
+                              neutral gray UI shell.
    --color-surface  #ffffff  The sheet. Pure white reserved for panels laid on
-                             the table, so cards read as paper.
+                              the table, so cards read as paper.
    --color-subtle   #e2e9ef  Recessed fills (inputs, chips) — the table showing
-                             through, not a separate gray.
+                              through, not a separate gray.
    --color-ink      #0f1d28  Near-black with a blue undertone so body copy sits
-                             in the ink family instead of floating as pure black.
+                              in the ink family instead of floating as pure black.
    --color-muted    #5a6b78  Ink thinned out. 4.8:1 on canvas — AA, not decorative.
    --color-line     #dce4ea  Hairline registration rule; visible, never a border.
    --color-line-strong #bfcbd5  Used when an edge has to hold a shape.
-   --color-brand    #6e44ff  Spherule Violet — the product's real color. White on
-                             it is 5.35:1; as text on canvas it is 4.67:1, so it
-                             clears AA both ways but should not be used for small
-                             text on canvas without checking.
-   --color-brand-bright #a78bfa  The app's glow token. Light — reserved for dark
-                             grounds (footer wash, confetti) and focus halos, never
-                             for text on white.
-   --color-brand-deep #5a33d9  Pressed state, derived by darkening the anchor;
-                             white on it is 7.3:1.
-   --color-tint     #ede9fe  The app's soft token — badge fills, icon containers,
-                             the same wash used behind variable pills in the editor.
-   --color-ink-deep #140f2b  The darkroom. Flat violet-black for the footer, pulled
-                             toward the brand so its glow belongs to the same light.
-                             Also the ghost-cursor fill: brand-family without being
-                             --color-brand itself, which the same canvas already
-                             uses for the selection ring and insertion-line cue.
+   --color-brand    #123c5a  Cyanotype Prussian Blue — the product's real colour.
+                              White on it is 11.5:1, and as text on canvas it is
+                              10.2:1, so it clears AA with room to spare and can
+                              carry small labels safely.
+   --color-brand-bright #2e7fa6  Wet print — the mid step of the wash. Reserved
+                              for dark grounds (footer wash, confetti) and focus
+                              halos. Only 3.9:1 as text on canvas, so never small
+                              text on a light ground.
+   --color-brand-deep #0c2c42  Pressed state; ink soaked into the stock.
+   --color-tint     #e1edf4  Plate wash — badge fills, icon containers, the same
+                              wash used behind variable pills in the editor.
+   --color-ink-deep #0a2231  The darkroom. Flat blue-black for the footer, on the
+                              same plate as the neutrals. Also the ghost-cursor
+                              fill: dark enough to read as an absence rather than
+                              as --color-brand, which the same canvas already uses
+                              for the selection ring and insertion-line cue.
    --color-mint     #2d6a4a  "Passes" — a sap/pine proofing annotation, not a neon
-                             UI success green. Stays clear of the brand hue so
-                             status never competes with identity.
+                              UI success green. Stays clear of the brand hue so
+                              status never competes with identity.
    --color-mint-soft #e2efe7  Its wash.
    --color-coral    #9a4527  "Flagged" — iron oxide, the red pencil in the margin.
-                             Muted so a warning reads as a reviewer's note.
+                              Muted so a warning reads as a reviewer's note.
    --color-coral-soft #f5e4dc  Its wash.
---------------------------------------------------------------------------- */
+   --------------------------------------------------------------------------- */
 
 @theme {
   /* Type — the proof is a printed artifact, so the headings are set, not stamped.
@@ -79,17 +81,17 @@
   --color-subtle: #e2e9ef;
 
   --color-ink: #0f1d28;
-  --color-ink-deep: #140f2b;
+  --color-ink-deep: #0a2231;
   --color-muted: #5a6b78;
 
   --color-line: #dce4ea;
   --color-line-strong: #bfcbd5;
 
   /* Copied verbatim from email-canvas/src/app/globals.css — one source of truth. */
-  --color-brand: #6e44ff;
-  --color-brand-bright: #a78bfa;
-  --color-brand-deep: #5a33d9;
-  --color-tint: #ede9fe;
+  --color-brand: #123c5a;
+  --color-brand-bright: #2e7fa6;
+  --color-brand-deep: #0c2c42;
+  --color-tint: #e1edf4;
 
   --color-mint: #2d6a4a;
   --color-mint-soft: #e2efe7;
@@ -97,7 +99,7 @@
   --color-coral-soft: #f5e4dc;
 
   --shadow-workbench:
-    0 28px 64px -24px rgba(15, 29, 40, 0.28), 0 10px 28px -14px rgba(110, 68, 255, 0.2);
+    0 28px 64px -24px rgba(15, 29, 40, 0.28), 0 10px 28px -14px rgba(18, 60, 90, 0.2);
 }
 
 html {

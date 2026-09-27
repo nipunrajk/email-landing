@@ -7,6 +7,14 @@ npm install
 npm run dev
 ```
 
+## Color
+
+**[`COLOR_SYSTEM.md`](COLOR_SYSTEM.md) is the single source for every color decision in this
+repo** — read it before any UI change. It holds the token table, the measured contrast
+figures, the traps, and the rules for what may not be used. No other document in this repo
+defines the palette. A pre-commit hook (`npm run hooks:install`) verifies this repo
+still agrees with `email-canvas`.
+
 ## Configuration
 
 Dev uses `.env.development` (editor at `localhost:3000`). Production builds read

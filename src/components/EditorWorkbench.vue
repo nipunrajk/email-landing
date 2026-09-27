@@ -23,8 +23,8 @@ const SIZE_OPTIONS = ['12', '14', '15', '18', '22', '28']
 const SWATCHES = [
   '#0f1d28',
   '#5a6b78',
-  '#6e44ff',
-  '#a78bfa',
+  '#123c5a',
+  '#2e7fa6',
   '#2d6a4a',
   '#9a4527',
   '#dce4ea',
@@ -106,7 +106,7 @@ const emailStyles = reactive({
   canvasBg: '#edf1f4',
   emailBg: '#ffffff',
   textColor: '#5a6b78',
-  brandColor: '#6e44ff',
+  brandColor: '#123c5a',
   width: '600px',
   padding: '20px',
   containerIndex: 0,
@@ -253,7 +253,7 @@ const blockSections = reactive<Record<Exclude<Selection, 'none'>, Section[]>>({
     {
       title: 'Style',
       rows: [
-        { label: 'Fill', value: '6E44FF', swatch: '#6e44ff' },
+        { label: 'Fill', value: '123C5A', swatch: '#123c5a' },
         { label: 'Radius', value: '8px', options: ['0px', '8px', '999px'] },
         { label: 'Width', toggle: ['Auto', 'Full'], activeIndex: 0 },
       ],
@@ -505,7 +505,7 @@ function handleGhostStartStory(story: 1 | 2) {
     activeView.value = 'desktop'
     openMenu.value = null
     formats.heading.font = 'Newsreader'
-    emailStyles.brandColor = '#6E44FF'
+    emailStyles.brandColor = '#123C5A'
     emailStyles.canvasBg = '#EDF1F4'
     emailStyles.emailBg = '#FFFFFF'
     emailStyles.textColor = '#5A6B78'

@@ -6,7 +6,9 @@
   "scripts": {
     "dev": "vite",
     "build": "vue-tsc -b && vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "hooks:install": "bash scripts/install-hooks.sh",
+    "color:check": "node scripts/hooks/checks/10-color-system.mjs"
   },
   "dependencies": {
     "vue": "^3.5.40",

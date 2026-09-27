@@ -366,7 +366,7 @@ function tick(timestamp: number) {
       cursorPos.value = swatchPickPos
       if (!firedS2.clickSwatchPick) {
         firedS2.clickSwatchPick = true
-        emit('trigger-color', '#a78bfa')
+        emit('trigger-color', '#2e7fa6')
       }
     } else if (elapsed <= S2_TO_SEND) {
       cursorPos.value = lerp(swatchPickPos, sendPos, progress(elapsed, S2_CLICK_SWATCH_PICK, S2_TO_SEND))

@@ -1,0 +1,61 @@
+#!/usr/bin/env bash
+#
+# Git pre-commit dispatcher.
+#
+# Runs every check in ./checks/ in filename order, then reports a summary.
+# Numeric filename prefixes control the order (10- before 20-).
+#
+# TO ADD A NEW CHECK: drop an executable file in checks/. Nothing else to edit.
+#
+# To skip for one commit:  git commit --no-verify
+
+set -uo pipefail
+
+HOOK_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+CHECKS_DIR="$HOOK_DIR/checks"
+
+if [ ! -d "$CHECKS_DIR" ]; then
+  echo "pre-commit: no checks directory at $CHECKS_DIR — nothing to run"
+  exit 0
+fi
+
+shopt -s nullglob
+checks=("$CHECKS_DIR"/*)
+shopt -u nullglob
+
+if [ ${#checks[@]} -eq 0 ]; then
+  echo "pre-commit: no checks installed — nothing to run"
+  exit 0
+fi
+
+failed=()
+for check in "${checks[@]}"; do
+  [ -f "$check" ] || continue
+  [ -x "$check" ] || chmod +x "$check" 2>/dev/null
+  name="$(basename "$check")"
+
+  # A check exits 0 to pass, 2 to say "skipped", anything else to fail.
+  output="$("$check" 2>&1)"; status=$?
+  if [ "$status" -eq 0 ]; then
+    echo "  ✓ $name"
+    [ -n "$output" ] && echo "$output" | sed 's/^/      /'
+  else
+    if [ "$status" -eq 2 ]; then
+      echo "  ○ $name — skipped"
+      [ -n "$output" ] && echo "$output" | sed 's/^/      /'
+    else
+      echo "  ✗ $name"
+      echo "$output" | sed 's/^/      /'
+      failed+=("$name")
+    fi
+  fi
+done
+
+echo
+if [ ${#failed[@]} -gt 0 ]; then
+  echo "Commit blocked by: ${failed[*]}"
+  echo "Fix the above, or commit anyway with: git commit --no-verify"
+  exit 1
+fi
+
+echo "pre-commit: all checks passed"

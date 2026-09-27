@@ -7,20 +7,19 @@
     aria-hidden="true"
   >
     <defs>
-      <!-- Baseplate: built around the shared brand anchor #6E44FF — the app's
-           --primary sits at the midpoint, with the plate darkening into it from
-           a lit top edge, so the mark reads as the same violet as the editor. -->
+      <!-- Baseplate: built around the shared brand anchor #123c5a — the editor's
+           --color-brand sits at the midpoint, with the plate darkening into it from
+           a lit top edge, so the mark reads as the same blue as the editor. Stops
+           mirror email-canvas/public/logo.svg, which is the canonical artwork. -->
       <linearGradient id="lego-plate-grad" x1="18%" y1="0%" x2="82%" y2="100%">
-        <stop offset="0%" stop-color="#8B6BFF" />
-        <stop offset="52%" stop-color="#6E44FF" />
-        <stop offset="100%" stop-color="#3D21A6" />
+        <stop offset="0%" stop-color="#2e7fa6" />
+        <stop offset="52%" stop-color="#123c5a" />
+        <stop offset="100%" stop-color="#0c2c42" />
       </linearGradient>
 
-
-
-      <!-- Arrow shadow: cast in the brand's own darkest value, not generic black -->
+      <!-- Arrow shadow: cast in the system's darkest ground, not generic black -->
       <filter id="arrow-shadow" x="-20%" y="-20%" width="150%" height="150%">
-        <feDropShadow dx="0" dy="2" stdDeviation="1.8" flood-color="#1F1147" flood-opacity="0.5" />
+        <feDropShadow dx="0" dy="2" stdDeviation="1.8" flood-color="#0a2231" flood-opacity="0.5" />
       </filter>
     </defs>
 

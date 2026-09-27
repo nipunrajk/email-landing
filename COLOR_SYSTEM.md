@@ -1,116 +1,126 @@
-# Color System Specification
+# Color — the single source for this repo
 
-This document details the complete color systems across the project ecosystem:
-1. **Landing Page (`email-landing`)** — *"The Proof"* (Editorial / Cyanotype Palette)
-2. **Editor Web Application (`email-canvas`)** — Spherule Brand & Canvas Hierarchy System
+**If you are an agent (opencode, Claude, Gemini, Copilot, or any other model) about to
+touch color in this repository, this is the file to read. It is the only one.**
 
----
-
-## 1. Landing Page (`email-landing`) — "The Proof"
-
-### Narrative & Design Philosophy
-Getdraft sits between a design file (Figma) and an email send. In print history, that in-between artifact is **the proof** (the blueline / cyanotype contact print pulled to inspect registration and quality before committing to an irreversible press run). 
-
-Email clients are the modern press: unforgiving, constrained reproduction targets. The landing page palette is drawn from the tangible artifacts of proofing—tinted proofing stock, deep iron prussian blue ink, pine inspection stamps, and red margin grease pencils—avoiding generic purple/blue SaaS defaults.
-
-### Token Architecture (`src/style.css` via `@theme`)
-
-#### Neutrals & Surfaces
-| CSS Variable | Value | Role | Visual Description |
-|---|---|---|---|
-| `--color-canvas` | `#edf1f4` | Page Canvas / Background | **Cool proofing-table paper**. Carries a subtle cyanotype ink undertone so the page reads as tinted stock rather than cold neutral gray. |
-| `--color-surface` | `#ffffff` | Sheet / Card Surface | **The proof sheet**. Pure white reserved strictly for foreground cards and panels laid on the table. |
-| `--color-subtle` | `#e2e9ef` | Recessed Fills | Recessed fills for inputs, chips, search bars, and hover backdrops. |
-| `--color-ink` | `#0f1d28` | Primary Text & Headings | Near-black carrying the cyanotype blue undertone. Ensures typography belongs to the ink family. |
-| `--color-muted` | `#5a6b78` | Secondary Copy & Metadata | Thinned ink. Clears 4.8:1 contrast on canvas (WCAG AA compliant). |
-| `--color-ink-deep` | `#0a2231` | Dark Ground (Footer) | **The darkroom**. High-contrast base for the footer and inverted sections, drawn from the same plate. |
-
-#### Borders & Registration Rules
-| CSS Variable | Value | Role | Usage |
-|---|---|---|---|
-| `--color-line` | `#dce4ea` | Hairline Rule | Hairline registration rules separating content zones without feeling like harsh boxed borders. |
-| `--color-line-strong` | `#bfcbd5` | Structural Border | Heavier rule used when an element boundary must hold a tactile edge (e.g. ghost buttons, active cards). |
-
-#### Brand & Plate Colors
-| CSS Variable | Value | Role | Usage |
-|---|---|---|---|
-| `--color-brand` | `#123c5a` | Primary Brand Color | **Cyanotype Prussian Blue**. Dark enough to carry white text at 11.4:1 contrast ratio. Primary CTAs, active highlights. |
-| `--color-brand-bright`| `#2e7fa6` | Wet Print Highlight | Specular light catching wet ink. Used for hover states, active pill indicators, and accents against dark surfaces. |
-| `--color-brand-deep` | `#0c2c42` | Pressed / Deep State | Pressed button states; ink soaked into the stock. |
-| `--color-tint` | `#e1edf4` | Plate Wash | Diluted plate wash for badge fills, category tags, and icon containers. |
-
-#### Status & Editorial Annotations
-| CSS Variable | Value | Role | Usage |
-|---|---|---|---|
-| `--color-mint` | `#2d6a4a` | "Passes" / Success | Sap/pine green proofing mark (editorial annotation rather than neon web success green). |
-| `--color-mint-soft` | `#e2efe7` | Success Wash | Soft background wash for successful validation badges. |
-| `--color-coral` | `#9a4527` | "Flagged" / Warning | Iron oxide / red pencil margin note. Deliberately muted so warnings read as reviewer notes rather than sirens. |
-| `--color-coral-soft` | `#f5e4dc` | Warning Wash | Soft background wash for warning flags and notices. |
-
-#### Brand Mark Gradient (`BrandMark.vue`)
-The chamfered dispatch badge uses a 3-stop angled linear gradient:
-- **Angle**: `x1="18%" y1="0%"` to `x2="82%" y2="100%"`
-- **Stop 0%**: `#2E1A6E` (Deep lacquered indigo top specular)
-- **Stop 48%**: `#3D1FA8` (Vibrant enamel midtone)
-- **Stop 100%**: `#1C0F52` (Near-black indigo base shadow)
-- **Hover Shadow**: `rgba(30, 10, 80, 0.55)`
+No other document in this repo defines or discusses the color scheme. Anything that needs
+a color, a token, or a palette question resolves here. If you find a hex in a component,
+it is a bug — use the token.
 
 ---
 
-## 2. Editor Web Application (`email-canvas`) — Spherule Canvas System
+## 1. The rule
 
-### Narrative & Design Philosophy
-The editor workspace requires a high-focus, low-fatigue environment with unmistakable visual hierarchy. Elements on the canvas (HTML sections, layout rows, and individual blocks) must be immediately identifiable when hovered or selected, requiring distinct contrast boundaries that meet WCAG non-text contrast rules (≥ 3:1).
+- **Use the tokens. Never write a hex value.** Raw hex in a component survives the next
+  re-theme and silently goes stale. This repo has had exactly that problem.
+- **Never reach for `indigo-*`, `violet-*`, `purple-*`, or `fuchsia-*`.** The brand was
+  electric violet (`#6e44ff`) until it was replaced. It is a Tailwind-violet-600 with the
+  chroma pushed past the default, which is the generic AI-SaaS look this palette exists to
+  avoid. It is not coming back, not even temporarily.
+- **One accent hue.** Brand blue for anything interactive or brand-bearing. Mint and coral
+  are **status only** — "passes" and "flagged". They are never decoration.
+- **Do not add a color that has no role.** If you need a step that doesn't exist, the fix
+  is a role, not a hex. Check §3 first — the trap is usually already solved.
 
-### Token Architecture (`src/app/globals.css`)
+## 2. The palette
 
-#### Core UI Tokens
-| Token | CSS Variable / OKLCH | Hex / Equivalent | Usage |
+15 tokens shared byte-for-byte with [`email-canvas`](../email-canvas/COLOR_SYSTEM.md), plus
+a 16th value that is renamed on that side. **This table is identical in both repos and is
+enforced by a pre-commit hook (§5).** Do not edit one copy.
+
+### Surfaces & text
+
+| Token | Value | Use it for | Measured |
 |---|---|---|---|
-| Primary Brand | `--primary` | `#6E44FF` | Spherule Violet brand accent. Applied to primary action buttons, focused input rings, active tab pills. |
-| Primary Soft | `--color-primary-soft` | `#ede9fe` | Variable pills (`{{first_name}}`), soft selections. |
-| Primary Glow | `--color-primary-glow` | `#a78bfa` | Soft focus rings and outline halos. |
-| Canvas Background | `--background` / `.canvas-bg` | `oklch(0.98 0 0)` / `#f8f9fb` | Neutral workbench canvas surface. |
-| Canvas Dot-Grid | Radial gradient | `#f8f9fb` + `rgba(124, 58, 237, 0.1)` | 22px × 22px dot grid aiding spatial alignment. |
-| Card / Panel | `--card` / `--popover` | `oklch(1 0 0)` (`#ffffff`) | Inspector sidebars, modal dialogs, toolbar chrome. |
-| Foreground | `--foreground` | `oklch(0.145 0 0)` | High-contrast dark text on chrome. |
-| Muted Foreground | `--muted-foreground` | `oklch(0.556 0 0)` | Secondary labels, dimension specs, hints. |
-| Border | `--border` | `oklch(0.922 0 0)` | Subtle panel dividers and input borders. |
+| `--color-canvas` | `#edf1f4` | Page background. Tinted stock, never a neutral gray. | — |
+| `--color-surface` | `#ffffff` | Cards, panels, popovers. | — |
+| `--color-subtle` | `#e2e9ef` | Recessed fills: inputs, chips, hover backdrops. | — |
+| `--color-ink` | `#0f1d28` | Body text, headings. | 15.07:1 on canvas |
+| `--color-muted` | `#5a6b78` | Secondary copy. | 4.85:1 canvas · 5.51:1 surface |
+| `--color-ink-deep` | `#0a2231` | Dark grounds. | — |
 
-#### Tier-Specific Canvas Selection Outlines
-In the visual email canvas, outline colors explicitly differentiate the DOM structural depth:
-| Structural Tier | Variable Name | Hex Code | Contrast on Canvas | Rationale |
-|---|---|---|---|---|
-| **Block** (text, button, image) | `--selection-block` | `#0284c7` (Sky-600) | **4.1:1** vs white | Upgraded from sky-500 (#0ea5e9 @ 2.8:1) to clear the WCAG AA 3:1 non-text contrast threshold. |
-| **Row** (multi-column container) | `--selection-row` | `#1e293b` (Slate-800) | **11.5:1** vs white | High-contrast dark boundary ensuring grid rows are unmistakable. |
-| **Section** (full-width wrapper) | `--selection-section` | `#475569` (Slate-600) | **5.3:1** vs white | Medium-slate perimeter marking outer page sections. |
+### Rules & edges
 
-#### Floating Canvas HUD Chrome
-- **Floating HUD Background**: `--canvas-hud-bg: var(--popover)` (`#ffffff`)
-- **Floating HUD Border**: `--canvas-hud-border: rgba(0, 0, 0, 0.06)` (Dark mode: `rgba(255, 255, 255, 0.12)`)
-- **Floating HUD Active Text/Icon**: `--canvas-hud-fg: var(--canvas-selection)`
+| Token | Value | Use it for |
+|---|---|---|
+| `--color-line` | `#dce4ea` | Hairline dividers. Decorative — not a state indicator. |
+| `--color-line-strong` | `#bfcbd5` | An edge that has to hold a shape: ghost buttons, active card outlines. |
 
----
+### Brand
 
-## 3. Quick Reference Matrix
+| Token | Value | Use it for | Measured |
+|---|---|---|---|
+| `--color-brand` | `#123c5a` | Cyanotype Prussian Blue. Primary CTAs, active states, focus rings. | white **11.54:1** · text on canvas **10.16:1** |
+| `--color-brand-bright` | `#2e7fa6` | Wet print. **Dark grounds and focus halos only.** | **3.93:1** on canvas — never small text on light |
+| `--color-brand-deep` | `#0c2c42` | Pressed state. | white **14.44:1** |
+| `--color-tint` | `#e1edf4` | Plate wash: badge fills, icon containers. | — |
 
+### Status — never decoration
+
+| Token | Value | Meaning |
+|---|---|---|
+| `--color-mint` | `#2d6a4a` | "Passes" |
+| `--color-mint-soft` | `#e2efe7` | "Passes" wash |
+| `--color-coral` | `#9a4527` | "Flagged" |
+| `--color-coral-soft` | `#f5e4dc` | "Flagged" wash |
+
+Why blue and not violet: the neutrals sit at hue ≈243° in OKLCH. The brand is 244°, so brand
+and ink come off one plate. The old violet was 285° — a 41° rotation at 3.7× the chroma, a
+different hue sitting on a blue-gray system, which reads as a sticker rather than a brand.
+Keep the hue family intact if you adjust anything.
+
+## 3. Traps — check these before adding a color
+
+**`--color-brand` on `--color-ink-deep` is 1.41:1.** A `bg-brand` button on the dark footer
+card effectively disappears. The footer's primary action is inverted
+(`bg-surface` / `text-ink`, 17.12:1) for exactly this reason.
+
+**`--color-brand-bright` cannot substitute for it either.** It is 4.47:1 with white and
+3.66:1 with every dark label in the system — a dead zone where nothing clears 4.5:1. Don't
+try to fix a dark-ground button by reaching for `brand-bright`; invert it.
+
+**`--color-brand-bright` is not a text color on light grounds.** 3.93:1 on canvas. It is for
+dark grounds and halos.
+
+**`--color-line` at 1.29:1 is decorative only.** It is fine as a divider and wrong as the
+only thing identifying an interactive control.
+
+**A sub-44px control in the editor mockup is a picture, not a control.** The mockup's
+toolbar buttons render at their real editor sizes. Don't resize them to satisfy a tap-target
+rule, and don't add `aria-label`s to them.
+
+## 4. Local to this repo
+
+**Brand mark.** `src/components/BrandMark.vue` and `public/favicon.svg` render the chamfered
+dispatch badge. Its three gradient stops are brand tokens, not new colors: `#2e7fa6` at 0%
+→ `#123c5a` at 52% → `#0c2c42` at 100%, with the arrow shadow in `#0a2231` at 0.5.
+`email-canvas/public/logo.svg` is the canonical artwork file.
+
+**The footer's confetti** samples a weighted ramp from these tokens — white ×6, tint ×3,
+brand-bright ×3, brand ×1, coral ×1 — so the hover scatter is brand-family with one warm
+accent in fourteen. If you change the palette, that weighting is in `SiteFooter.vue` and
+wants a look.
+
+**Known rough edge, not a regression.** The brand ramp has ~10.8° of hue drift
+(`tint` and `brand-bright` at H≈233°, `brand` and `brand-deep` at H≈243°) and a 0.37
+lightness gap between `tint` (L 0.94) and `brand-bright` (L 0.57). This predates the
+cyanotype port. Closing it means adding a step at L≈0.75 — which needs a role to consume it
+before it earns a place. Don't "fix" it casually.
+
+## 5. Verify
+
+A git pre-commit hook enforces this file. It runs on every commit in both repos:
+
+```sh
+npm run hooks:install     # once per clone
 ```
-PROJECT: email-landing ("The Proof")
-├── Canvas Base:       #edf1f4  (Cool tinted paper)
-├── Surface:           #ffffff  (Proof sheet)
-├── Ink (Body Text):   #0f1d28  (Near-black Prussian Blue)
-├── Muted Text:        #5a6b78  (AA Compliant secondary copy)
-├── Primary Brand:     #123c5a  (Cyanotype Blue)
-├── Brand Hover:       #2e7fa6  (Wet print cyan)
-├── Line Rules:        #dce4ea  (Hairline) / #bfcbd5 (Strong)
-├── Mint (Pass):       #2d6a4a  / Wash: #e2efe7
-└── Coral (Flag):      #9a4527  / Wash: #f5e4dc
 
-PROJECT: email-canvas (Editor App)
-├── Brand Primary:     #6E44FF  (Spherule Violet)
-├── Soft Accent:       #ede9fe  (Pills & selections)
-├── Canvas Surface:    #f8f9fb  (Dot-grid background)
-├── Block Selection:   #0284c7  (Sky-600 outline)
-├── Row Selection:     #1e293b  (Slate-800 outline)
-└── Section Selection: #475569  (Slate-600 outline)
-```
+The hook checks three things: that the two repos' CSS declare the same shared tokens, that
+this table matches the CSS, and that no component has hardcoded a brand value. If it
+fails, **`email-canvas/src/app/globals.css` is canonical** — change it there, copy into
+`src/style.css`, update the table above, and commit again.
+
+Run it by hand any time with `node scripts/hooks/checks/10-color-system.mjs`.
+
+To add another check later, drop a file in `scripts/hooks/checks/`. The dispatcher picks it
+up; no wiring needed. Bypass a single commit with `git commit --no-verify`.
