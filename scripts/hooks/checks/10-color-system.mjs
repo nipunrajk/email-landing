@@ -69,6 +69,8 @@ const ALLOWLIST = {
     'Drives the mockup above; a swatch pick has to be a real value.',
   'email-canvas/src/components/DashboardView.tsx':
     'Default for user-authored block styling, not a brand decision.',
+  'email-canvas/src/lib/templates.ts':
+    'Email template definitions for exported emails; email clients do not support CSS custom properties, requiring literal hex values.',
 }
 
 const problems = []
